@@ -89,8 +89,8 @@ export const categories = [
                             meta: ["health", "safety"]},
  
 
-                           {name: "Entertaining",
-                           meta: []},
+                          //  {name: "Entertaining",
+                          //  meta: []},
                             
 
                            {name: "Property Service Charges", 
@@ -142,7 +142,7 @@ export const categories = [
                            
                                   
                            {name: "Advertising and Promotion",
-                            meta: ["ad", "radio", "billboard", "TV", "announcement", "sponsor",
+                            meta: ["radio", "billboard", "TV", "announcement", "sponsor",
                                    "media", "social", "facebook", "twitter", "instagram"]},
                               
 
@@ -151,8 +151,8 @@ export const categories = [
                                    "ibuprofen"]},
                               
 
-                           {name: "Sundry",
-                            meta: []},
+                          //  {name: "Sundry",
+                          //   meta: []},
 
                             
                            {name: "Taxes",

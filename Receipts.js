@@ -30,9 +30,14 @@ class Receipts extends Component{
                 showDate: false,
                 category: 0,
                 images: [],
-                uploading: false,
+                analysing: false,
                 showImage: false,
-                displayImage: null}
+                displayImage: null,
+                extractedInfo: {money: {value: null, currency: 0}, 
+                                date:{day: null, month: null, year: null}, 
+                                category: -1},
+                valid: false              
+                }
 
   }
 
@@ -144,12 +149,20 @@ class Receipts extends Component{
         this.setState({ 
                         images: [...this.state.images, pickerResult],
                         showImage: true,
-                        displayImage: pickerResult.uri });
+                        displayImage: pickerResult.uri,
+                        analysing: true});
 
         const result = await callGoogleVisionAsync(pickerResult.base64)
-        var extracted = extractData(result)
-        console.log(extracted)
+        
 
+        if (!result) {this.setState({valid: false,
+                                        analysing: false})}
+        else {
+        
+        var extracted = extractData(result)
+        this.setState({valid: true, 
+                       analysing: false,
+                       extractedInfo: extracted})}
 
       }
      
@@ -162,6 +175,37 @@ class Receipts extends Component{
     var db = fire.firestore()
     var userID = fire.auth().currentUser.userID;
     
+    let extractedInfo = this.state.extractedInfo
+    let money = extractedInfo.money
+    let date = extractedInfo.date
+    let category = extractedInfo.category
+
+    let displayValues
+    let notDetected = "not detected"
+
+    if (this.state.valid) {
+
+      let moneyText
+      if (money.value) {moneyText = currencies[money.currency].symbol + money.value}
+      else {moneyText = notDetected}
+
+      let dateText
+      if (date) {dateText = date.day + " " + months[date.month] + " " + date.year}
+      else {dateText = notDetected}
+
+      let categoryText
+      if (category >= 0) {categoryText = categories[category].name}
+      else {categoryText = notDetected}
+
+      displayValues = <View style={{alignContent: 'center', width: "80%"}}> 
+                        <Text> We were able to extract the following information from this image: </Text>
+                        <Text> Amount:  {moneyText}</Text>
+                        <Text> Date: {dateText} </Text>
+                        <Text> Category: {categoryText} </Text>
+                      </View>
+    } else { 
+      displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
+    }
 
       return(
       
@@ -188,10 +232,18 @@ class Receipts extends Component{
 
                 <Modal isVisible={this.state.showImage}>
                   <View style={{backgroundColor: 'white', alignItems: 'center'}}>
-                    <Text>I am the modal content!</Text>
-                    {!this.state.uploading && <Image source={{uri: this.state.displayImage}}
+
+                    {this.state.analysing && <Text> Analysing - please wait... </Text> }
+                    {this.state.analysing && <Image source={loading}/>}
+                    
+
+                    {!this.state.analysing && <Image source={{uri: this.state.displayImage}}
                            style={{width: "80%", height: "80%"}} />}
-                    {this.state.uploading && <Image source={loading} /> }      
+
+                           
+                    
+                    {!this.state.analysing && displayValues }
+
                     <TouchableOpacity
                       style = {styles.photoButton}
                         onPress = {

@@ -28,10 +28,18 @@ export async function callGoogleVisionAsync(image) {
     body: JSON.stringify(body),
   });
 
-  const parsed = await response.json();
+  try {
+    const parsed = await response.json();
+  
 
   // console.log(parsed)
 
   // console.log("type", typeof(parsed.responses[0].fullTextAnnotation.text))
-  return parsed.responses[0].fullTextAnnotation.text;
+    return parsed.responses[0].fullTextAnnotation.text;}
+
+  catch {
+
+    return null
+
+  }
 }

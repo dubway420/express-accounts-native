@@ -37,7 +37,7 @@ function extractDateAlt (words) {
        
       if (found) {
        
-        month = parseInt(month_index) + 1
+        month = parseInt(month_index)
 
         var number_word_split = word.split(/([0-9]+)/).filter(Number)
         
@@ -89,6 +89,8 @@ function extractDateAlt (words) {
      
   }
 
+  return null
+
  
 }
  
@@ -130,7 +132,7 @@ function checkDate(d) {
   if (day !== undefined && month !== undefined) {
 
     return {day: parseInt(day), 
-            month: parseInt(month),
+            month: parseInt(month) -1,
             year: parseInt(year)} 
   } else {
     return null
@@ -163,15 +165,15 @@ function categoryFinder(test_string){
 
   }
   
-// console.log(category_counts)
+  console.log(category_counts)
 
   if (found) {
     var highestCategoryIndex = category_counts.indexOf(Math.max(...category_counts))
 
-    return categories[highestCategoryIndex].name
+    return highestCategoryIndex
   } 
   
-  return "No Category Found"
+  return -1
   
 }
 
@@ -185,6 +187,12 @@ function extractData(text) {
   /* GBP = words.filter(checkGBP, currency_symbols[0]) */
   
   var GBP = words.map(checkCurrency, "£").filter(Number)
+
+  var amount
+  if (GBP.length > 0) {amount = Math.max(...GBP)}
+  else {amount = null}
+
+  // console.log(words)
   
   var date = words.map(checkDate).filter(item => item)[0]
   
@@ -204,9 +212,9 @@ function extractData(text) {
   var category = categoryFinder(text) 
   
   return {
-  
+    
     money: {
-      value: Math.max(...GBP),
+      value: amount,
       currency: 0
       },
     
