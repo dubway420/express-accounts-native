@@ -92,9 +92,9 @@ class Login extends Component{
                 autoCapitalize = "none"
                 onChangeText = {(email) => { this.setState({ email: email, error: false})}}/>
               
-              <View style = {styles.input}>
+              <View style = {styles.inputAlt}>
                   
-                  <TextInput style={styles.inputAlt}
+                  <TextInput style={styles.inputAltInner}
                 underlineColorAndroid = "transparent"
                 type="password"
                 id="password"

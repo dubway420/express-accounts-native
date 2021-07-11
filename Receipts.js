@@ -11,12 +11,14 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {months, currencies, categories} from './constants'
 import * as ImagePicker from "expo-image-picker";
 import uuid from "uuid";
+// import Modal from 'modal-react-native-web';
 import Modal from 'react-native-modal';
 import {callGoogleVisionAsync} from './vision'
 import extractData from './extractors'
+import DatePicker from 'react-mobile-datepicker'
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
-LogBox.ignoreLogs([`Setting a timer for a long period`]);
+// LogBox.ignoreLogs([`Setting a timer for a long period`]);
 
 
 class Receipts extends Component{
@@ -42,14 +44,14 @@ class Receipts extends Component{
   }
 
   async componentDidMount() {
-    if (Platform.OS !== "web") {
+    // if (Platform.OS !== "web") {
       const {
         status,
       } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         alert("Sorry, we need camera roll permissions to make this work!");
       }
-    }
+    // }
   }
 
   
@@ -169,8 +171,51 @@ class Receipts extends Component{
 
   };
 
+  handleCancel = () => {
+    this.setState({ showDate: false });
+  }
+
+  handleSelect = (date) => {
+    this.setState({ date: date, showDate: false });
+  }
+
+  
+
 
   render() {
+
+    const monthMap = {
+      '1': 'Jan',
+      '2': 'Feb',
+      '3': 'Mar',
+      '4': 'Apr',
+      '5': 'May',
+      '6': 'Jun',
+      '7': 'Jul',
+      '8': 'Aug',
+      '9': 'Sep',
+      '10': 'Oct',
+      '11': 'Nov',
+      '12': 'Dec',
+  };
+   
+  const dateConfig = {
+        'date': {
+          format: 'DD',
+          caption: 'Day',
+          step: 1,
+      },
+      'month': {
+          format: value => monthMap[value.getMonth() + 1],
+          caption: 'Mon',
+          step: 1,
+      },
+      'year': {
+        format: 'YYYY',
+        caption: 'Year',
+        step: 1,
+    },
+  };
 
     var db = fire.firestore()
     var userID = fire.auth().currentUser.userID;
@@ -230,7 +275,7 @@ class Receipts extends Component{
 
               <View style={styles.borderedBox}>
 
-                <Modal isVisible={this.state.showImage}>
+                <Modal visible={this.state.showImage}>
                   <View style={{backgroundColor: 'white', alignItems: 'center'}}>
 
                     {this.state.analysing && <Text> Analysing - please wait... </Text> }
@@ -285,6 +330,17 @@ class Receipts extends Component{
                   display="default"
                   onChange={this.dateChange}
                 />}
+
+                {/* <DatePicker
+                    value={this.state.date}
+                    isOpen={this.state.showDate}
+                    confirmText={'OK'}
+                    cancelText={'Cancel'}
+                    onSelect={this.handleSelect}
+                    onCancel={this.handleCancel} 
+                    dateConfig={dateConfig}/> */}
+
+
 
                 <Text style={styles.label}>Category</Text>
                 

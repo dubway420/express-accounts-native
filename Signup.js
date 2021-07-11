@@ -195,7 +195,7 @@ export class Signup extends Component{
 
             
 
-            <View style = {styles.textContainer}>
+            {/* <View style = {styles.textContainer}> */}
             {this.state.email_warn && <Text style={styles.error}>Error: Invalid email address.</Text>}
                 <TextInput style = {styles.input}
                     underlineColorAndroid = "transparent"
@@ -210,9 +210,9 @@ export class Signup extends Component{
                 
                 
                 {this.state.password_warn && <Text style={styles.error}>Error: Invalid password.</Text>}
-                <View style = {styles.input}>
+                <View style = {styles.inputAlt}>
                   
-                  <TextInput style={styles.inputAlt}
+                  <TextInput style={styles.inputAltInner}
                       underlineColorAndroid = "transparent"
                       type="password"
                       id="password"
@@ -234,12 +234,12 @@ export class Signup extends Component{
                 <Text style = {this.state.pvalid8 ?  styles.passwordCorrect : styles.passwordMessage} > {this.state.pvalid8 ? '\u2713': '\u2717'} at least 8 characters</Text>
                 <Text style = {this.state.pvalidUpperLower ?  styles.passwordCorrect : styles.passwordMessage} > {this.state.pvalidUpperLower ? '\u2713': '\u2717'} upper and lowercase letters</Text>
                 <Text style = {this.state.pvalidNumbers ?  styles.passwordCorrect : styles.passwordMessage} > {this.state.pvalidNumbers ? '\u2713': '\u2717'} at least one number</Text>
-            </View> 
+            {/* </View>  */}
             
             {this.state.password_check_warn && <Text style={styles.error}>Error: Invalid confirmation password.</Text>}
-            <View style = {styles.input}>
+            <View style = {styles.inputAlt}>
 
-            <TextInput style = {styles.inputAlt}
+            <TextInput style = {styles.inputAltInner}
                     underlineColorAndroid = "transparent"
                     type="password_check"
                     id="password_check"
@@ -284,7 +284,7 @@ export class Signup extends Component{
             {this.state.password_check_message && <Text style={this.state.password_check_valid ? styles.passwordCorrect : styles.error}>{this.state.password_check_message}</Text>}
             
             {this.state.fname_warn && <Text style={styles.error}>Error: Please provide a first name.</Text>}
-            <View style = {styles.textContainer}>
+            {/* <View style = {styles.textContainer}> */}
 
                 <TextInput style = {styles.input}
                     underlineColorAndroid = "transparent"
@@ -329,7 +329,7 @@ export class Signup extends Component{
                                                                    fnumber_valid: phoneNumberVerifier(fnumber),
                                                                    fnumber_warn: false})}}/>      
             
-            </View>
+            {/* </View> */}
 
             <TouchableOpacity
                 style = {styles.submitButton}

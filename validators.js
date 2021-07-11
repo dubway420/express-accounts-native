@@ -17,7 +17,7 @@ export function emailVerifier(value) {
 
 export function passwordVerifier(value){
 
-  returnArray = [false, false, false]
+  let returnArray = [false, false, false]
 
     if (value.length >= 8) {
     
