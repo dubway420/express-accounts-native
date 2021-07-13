@@ -4,6 +4,7 @@ import EmailNotVerified from './emailNotVerified'
 import React from "react"
 import ImageExtract from './ImageExtract'
 import Receipts from './Receipts'
+import {displayValues} from './testSpace'
 
 
 class App extends React.Component {
@@ -67,6 +68,7 @@ class App extends React.Component {
     else {
         return (
         <Receipts/>
+        // displayValues
         )
       }
       }

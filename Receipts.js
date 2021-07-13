@@ -16,29 +16,41 @@ import Modal from 'react-native-modal';
 import {callGoogleVisionAsync} from './vision'
 import extractData from './extractors'
 import DatePicker from 'react-mobile-datepicker'
+import CheckBox from '@react-native-community/checkbox';
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
-// LogBox.ignoreLogs([`Setting a timer for a long period`]);
+LogBox.ignoreLogs([`Setting a timer for a long period`]);
 
 
 class Receipts extends Component{
   constructor(props){
     super(props)
     // this.signOut = this.signOut.bind(this);
-    this.state={currency: 0,
-                amount: 0,
+    this.state={
+
+                currency: 0,
+                amount: null,
                 amountValid: false,
                 date: new Date(),
-                showDate: false,
                 category: 0,
                 images: [],
+
+                showDate: false,
                 analysing: false,
                 showImage: false,
                 displayImage: null,
                 extractedInfo: {money: {value: null, currency: 0}, 
                                 date:{day: null, month: null, year: null}, 
                                 category: -1},
-                valid: false              
+
+                valid: false,
+                
+                moneyAccept: false,
+                dateAccept: false,
+                categoryAccept: false,
+
+                displayPhoto: false,
+                imageToDisplay: null
                 }
 
   }
@@ -149,7 +161,6 @@ class Receipts extends Component{
         // const uploadUrl = await uploadImageAsync(pickerResult.uri);
 
         this.setState({ 
-                        images: [...this.state.images, pickerResult],
                         showImage: true,
                         displayImage: pickerResult.uri,
                         analysing: true});
@@ -161,15 +172,37 @@ class Receipts extends Component{
                                         analysing: false})}
         else {
         
-        var extracted = extractData(result)
-        this.setState({valid: true, 
-                       analysing: false,
-                       extractedInfo: extracted})}
+          var extracted = extractData(result)
+          this.setState({valid: true, 
+                        analysing: false,
+                        extractedInfo: extracted})}
 
       }
      
 
   };
+
+  closeButton = () => {
+
+    let extractedInfo = this.state.extractedInfo
+
+    var countAccept = 0
+
+    if (this.state.moneyAccept)    {countAccept += 1
+                                    this.amountHandler(String(extractedInfo.money.value))}
+
+    if (this.state.dateAccept)     {countAccept += 1
+                                    let newDate = new Date(extractedInfo.date.year, extractedInfo.date.month, extractedInfo.date.day)
+                                    this.setState({date: newDate})}
+
+    if (this.state.categoryAccept) {countAccept += 1
+                                    this.setState({category: extractedInfo.category})}
+
+    this.setState({moneyAccept: false, dateAccept: false, categoryAccept: false, showImage: false})
+
+    if (countAccept >= 1) {this.setState({images: [...this.state.images, this.state.displayImage]})}
+
+  }
 
   handleCancel = () => {
     this.setState({ showDate: false });
@@ -179,7 +212,73 @@ class Receipts extends Component{
     this.setState({ date: date, showDate: false });
   }
 
-  
+  photoPressed = (index) => {
+
+    this.setState({
+                   displayPhoto: true,
+                   imageToDisplay: this.state.images[index]
+    })
+
+    console.log(this.state.displayPhoto)
+
+  }
+
+  photoLine = (index) => {
+
+    return <Text onPress = {() => this.photoPressed(index)} key={index} style={{color: 'blue', marginVertical: 5}}> Photo{index+1} </Text>
+  }
+
+  returnPhotos = () => {
+
+    var photos = this.state.images.map(function(itemObject, index){
+      return this.photoLine(index)
+
+    }, this)
+
+    return photos
+
+  }
+
+  closeButton2 = () => {
+    this.setState({displayPhoto: false,
+                imageToDisplay: null})
+  }
+
+  submitReceipt = () => {
+
+    var db = fire.firestore()
+    var userID = fire.auth().currentUser.userID;
+    
+    var numberReceipt = 0
+    var userReceipts = db.collection("users").doc(userID).collection("receipts")
+
+    userReceipts.get().then(docSnapshot => {
+      if (docSnapshot.exists) {
+        console.log("exists")
+      }else {
+        
+        var receiptName = "R" + String(numberReceipt)
+
+        userReceipts.doc(receiptName).set({
+          currency: this.state.currency,
+          amount: parseFloat(this.state.amount),
+          date: this.state.date,
+          category: this.state.category
+      })
+      .then(() => {
+          console.log("Document successfully written!");
+      })
+      .catch((error) => {
+          console.error("Error writing document: ", error);
+      });
+
+      }
+    });
+
+
+
+  }
+
 
 
   render() {
@@ -217,9 +316,8 @@ class Receipts extends Component{
     },
   };
 
-    var db = fire.firestore()
-    var userID = fire.auth().currentUser.userID;
-    
+
+
     let extractedInfo = this.state.extractedInfo
     let money = extractedInfo.money
     let date = extractedInfo.date
@@ -228,28 +326,71 @@ class Receipts extends Component{
     let displayValues
     let notDetected = "not detected"
 
+    var moneyOutput = false 
+    var dateOutput = false
+    var categoryOutput = false
+
     if (this.state.valid) {
 
       let moneyText
-      if (money.value) {moneyText = currencies[money.currency].symbol + money.value}
+      if (money.value) {moneyText = currencies[money.currency].symbol + money.value
+                        moneyOutput = true}
       else {moneyText = notDetected}
 
       let dateText
-      if (date) {dateText = date.day + " " + months[date.month] + " " + date.year}
+      if (date) {dateText = date.day + " " + months[date.month] + " " + date.year
+                 dateOutput = true}
       else {dateText = notDetected}
 
       let categoryText
-      if (category >= 0) {categoryText = categories[category].name}
+      if (category >= 0) {categoryText = categories[category].name
+                          categoryOutput = true}
       else {categoryText = notDetected}
 
+
       displayValues = <View style={{alignContent: 'center', width: "80%"}}> 
-                        <Text> We were able to extract the following information from this image: </Text>
-                        <Text> Amount:  {moneyText}</Text>
-                        <Text> Date: {dateText} </Text>
-                        <Text> Category: {categoryText} </Text>
-                      </View>
+                        <Text style={styles.outline}>We were able to extract the following information from this image: </Text> 
+                        
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> </Text> 
+                            <Text style={styles.outline}> Accept? </Text> 
+                        </View>
+
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> Amount:  {moneyText}</Text> 
+                            <CheckBox style={styles.checkBoxActual} disabled={!moneyOutput} value={this.state.moneyAccept} onValueChange={(newValue) => this.setState({moneyAccept: newValue})} /> 
+                        </View>
+
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> Date: {dateText} </Text>
+                            <CheckBox style={styles.checkBoxActual} disabled={!dateOutput} value={this.state.dateAccept} onValueChange={(newValue) => this.setState({dateAccept: newValue})} /> 
+                        </View>
+
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> Category: {categoryText} </Text>
+                            <CheckBox style={styles.checkBoxActual} disabled={!categoryOutput} value={this.state.categoryAccept} onValueChange={(newValue) => this.setState({categoryAccept: newValue})} /> 
+                        </View>
+                    </View>
+
     } else { 
       displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
+    }
+
+    if (!moneyOutput && !dateOutput && !categoryOutput) {
+      displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
+    }
+
+    
+
+    let photoPanel 
+    if (this.state.images.length > 0) {
+
+      var photos = this.returnPhotos()
+      photoPanel = <View>
+                    <Text style={styles.label}>Photos for this receipt</Text>
+                    {photos}
+                   </View>
+
     }
 
       return(
@@ -275,28 +416,42 @@ class Receipts extends Component{
 
               <View style={styles.borderedBox}>
 
-                <Modal visible={this.state.showImage}>
-                  <View style={{backgroundColor: 'white', alignItems: 'center'}}>
+                <Modal style={{margin: 0}} visible={this.state.showImage}>
+                  <SafeAreaView style={{width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+                    
 
                     {this.state.analysing && <Text> Analysing - please wait... </Text> }
                     {this.state.analysing && <Image source={loading}/>}
                     
 
                     {!this.state.analysing && <Image source={{uri: this.state.displayImage}}
-                           style={{width: "80%", height: "80%"}} />}
+                           style={{width: "80%", height: "65%", paddingVertical: 20}} />}
 
-                           
-                    
                     {!this.state.analysing && displayValues }
 
                     <TouchableOpacity
                       style = {styles.photoButton}
-                        onPress = {
-                        () => this.setState({showImage: false})
-                        }>
+                        onPress = {this.closeButton}>
                         <Text style = {styles.submitButtonText}> Close </Text>
                     </TouchableOpacity>
-                  </View>
+                  </SafeAreaView>
+                </Modal>
+
+
+
+                <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
+                  <SafeAreaView style={{width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+                    
+                          <Image source={{uri: this.state.imageToDisplay}}
+                           style={{width: "80%", height: "65%", paddingVertical: 20}} />
+
+                    <TouchableOpacity
+                      style = {styles.photoButton}
+                      onPress = {this.closeButton2}>
+                        <Text style = {styles.submitButtonText}> Close </Text>
+                    </TouchableOpacity>
+
+                  </SafeAreaView>
                 </Modal>
 
                 <Text style={styles.label}>Amount</Text>
@@ -310,6 +465,7 @@ class Receipts extends Component{
                       type="number"
                       id="value"
                       name="vaue"
+                      value={this.state.amount}
                       keyboardType="numeric"
                       placeholder="Value"
                       placeholderTextColor = "black"
@@ -370,13 +526,24 @@ class Receipts extends Component{
                   }>
                   <Text style = {styles.submitButtonText}> Upload </Text>
                 </TouchableOpacity>
-                
 
+                
+                {photoPanel}
+
+                  
+                <TouchableOpacity
+                  style = {styles.doneButton}
+                  onPress = {
+                      () => this.submitReceipt()
+                  }>
+                  <Text style = {styles.submitButtonText}> Complete </Text>
+                </TouchableOpacity>
+                
               </View>
 
 
 
-            <Button onPress={this.signOut} title="Sign Out" />  
+              <Button onPress={this.signOut} title="Sign Out" />  
 
             </View>  
 

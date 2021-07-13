@@ -247,7 +247,8 @@ export const styles = StyleSheet.create({
     width: '40%'
  },
    submitButtonText:{
-      color: 'white'
+      color: 'white',
+      textAlign: 'center'
    },
    error: {
      color: 'red',
@@ -269,6 +270,40 @@ export const styles = StyleSheet.create({
       // paddingLeft: "5%",
       // marginLeft: 10
       
+},
+CheckBoxContainer: {
+  // flex:1,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  // margin: 15,
+  // height: 40,
+  borderColor: '#61040f',
+  // borderWidth: 1,
+  // padding: 5,
+  // width: '90%',
+  backgroundColor: '#fff',
+  color: '#424242',
+},
+outline : {
+  width: "80%",
+  borderColor: 'grey',
+  // borderBottomWidth: 1,
+},
+checkBoxActual: {
+  width: "100%",
+  borderColor: '#61040f',
+  borderWidth: 1,
+  justifyContent: 'center'
+},
+doneButton: {
+  textAlign: 'center',
+  backgroundColor: '#800020',
+  padding: 10,
+  margin: 30,
+  height: 40,
+  width: '80%'
 },
 
   });
