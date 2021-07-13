@@ -17,6 +17,7 @@ import {callGoogleVisionAsync} from './vision'
 import extractData from './extractors'
 import DatePicker from 'react-mobile-datepicker'
 import CheckBox from '@react-native-community/checkbox';
+import {saveReceipt} from './saveReceipt'
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
 LogBox.ignoreLogs([`Setting a timer for a long period`]);
@@ -246,35 +247,8 @@ class Receipts extends Component{
 
   submitReceipt = () => {
 
-    var db = fire.firestore()
-    var userID = fire.auth().currentUser.userID;
-    
-    var numberReceipt = 0
-    var userReceipts = db.collection("users").doc(userID).collection("receipts")
 
-    userReceipts.get().then(docSnapshot => {
-      if (docSnapshot.exists) {
-        console.log("exists")
-      }else {
-        
-        var receiptName = "R" + String(numberReceipt)
-
-        userReceipts.doc(receiptName).set({
-          currency: this.state.currency,
-          amount: parseFloat(this.state.amount),
-          date: this.state.date,
-          category: this.state.category
-      })
-      .then(() => {
-          console.log("Document successfully written!");
-      })
-      .catch((error) => {
-          console.error("Error writing document: ", error);
-      });
-
-      }
-    });
-
+    saveReceipt(this.state.currency, this.state.amount, this.state.date, this.state.category)
 
 
   }
