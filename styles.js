@@ -5,7 +5,15 @@ export const styles = StyleSheet.create({
     
     outerContainer: {
       flex: 1,
+      height: "90%",
       marginTop: StatusBar.currentHeight,
+    },
+    outerContainer2: {
+      width: "100%",
+      flex: 1,
+      marginTop: StatusBar.currentHeight,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     container: {
       paddingTop: StatusBar.currentHeight,
@@ -19,14 +27,15 @@ export const styles = StyleSheet.create({
       backgroundColor: '#00000000',
       marginHorizontal: 15,
       alignSelf: "center",
-      width: '95%'
+      width: '95%',
+      height: '90%'
     },
     box: {
       marginTop:15,
       flex: 1,
       flexWrap: 'wrap',
       backgroundColor: "white",
-      // alignItems: "center",
+      height: '90%',
       justifyContent: "center",
       },
     large: {position:'absolute',
@@ -88,11 +97,46 @@ export const styles = StyleSheet.create({
       backgroundColor: '#fff',
       color: '#424242',
    },
+   graph: {
+    flex:1,
+    flexDirection: 'row',
+    // justifyContent: 'space-evenly',
+    // alignItems: 'center',
+    backgroundColor: '#fff',
+    marginLeft: 5,
+    // height: "100%",
+    borderColor: '#61040f',
+    // borderWidth: 1,
+    padding: 5,
+    width: '95%',
+    backgroundColor: '#fff',
+    color: '#424242',
+    
+ },
+  moreInfo: {
+    borderColor: '#61040f',
+    // borderBottomWidth: 1,
+    marginLeft: 5,
+    marginBottom: 5,
+  },
    label: {
      paddingLeft: 5,
      width: "100%",
      textDecorationLine: 'underline'
 
+   },
+   label2: {
+    paddingLeft: 15,
+    paddingTop: 5,
+    width: "100%",
+    textDecorationLine: 'underline',
+    borderColor: '#61040f',
+    borderTopWidth: 1,
+  },
+   message: {
+    paddingLeft: 5,
+    width: "100%",
+    fontSize: 10
    },
    date: {
     padding: 5,
@@ -246,6 +290,13 @@ export const styles = StyleSheet.create({
     height: 40,
     width: '40%'
  },
+ utilityButton: {
+  backgroundColor: '#800020',
+  padding: 10,
+  margin: 15,
+  height: 40,
+  width: '25%'
+},
    submitButtonText:{
       color: 'white',
       textAlign: 'center'

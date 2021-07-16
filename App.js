@@ -3,6 +3,7 @@ import Login from './Login'
 import EmailNotVerified from './emailNotVerified'
 import React from "react"
 import ImageExtract from './ImageExtract'
+import ReceiptsView from './receiptsView'
 import Receipts from './Receipts'
 import {displayValues} from './testSpace'
 
@@ -67,7 +68,8 @@ class App extends React.Component {
     } 
     else {
         return (
-        <Receipts/>
+        <ReceiptsView/>
+        // <Receipts/>
         // displayValues
         )
       }

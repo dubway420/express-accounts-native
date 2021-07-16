@@ -17,8 +17,12 @@
     "react-dom": "16.13.1",
     "react-mobile-datepicker": "^4.0.2",
     "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
+    "react-native-chart-kit": "^6.11.0",
     "react-native-date-picker": "^3.3.2",
     "react-native-modal": "^12.0.2",
+    "react-native-popup": "^0.6.1",
+    "react-native-simple-dialogs": "^1.4.0",
+    "react-native-svg": "^12.1.1",
     "react-native-web": "~0.13.12"
   },
   "devDependencies": {

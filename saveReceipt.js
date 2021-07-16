@@ -1,6 +1,8 @@
 import fire from './fire'
 import {currencies, categories} from './constants'
+import {userLogReceipts, userReceipts} from './fireStoreRefs'
 
+var success = false
 
 export function saveReceipt(currency, amount, date, category) {
 
@@ -13,13 +15,6 @@ export function saveReceipt(currency, amount, date, category) {
     var currencyCount = new Array(currencies.length).fill(0);
     var currencyTotals = new Array(currencies.length).fill(0);
         
-    var db = fire.firestore()
-    var userID = fire.auth().currentUser.uid;
-
-    var userFB = db.collection("users").doc(userID)
-    var userReceipts = userFB.collection("receipts")
-    var userLogReceipts = userFB.collection("logs").doc("receipts")
-
 
     userLogReceipts.get().then((doc) => {
         if (doc.exists) {
@@ -64,7 +59,13 @@ export function saveReceipt(currency, amount, date, category) {
                 date,
                 category,
                 logged: new Date
+            }).then(() => {
+        
+                return true
             })
+            .catch((error) => {
+                console.log(error)
+            });
 
 
 
@@ -102,15 +103,17 @@ export function saveReceipt(currency, amount, date, category) {
         logged: new Date
     })
     .then(() => {
-        console.log("Document successfully written!");
+        
+        return true
     })
     .catch((error) => {
-        console.error("Error writing document: ", error);
+        
     });
 
     }
     });
 
-
+    console.log(success)
+ 
 
 }
