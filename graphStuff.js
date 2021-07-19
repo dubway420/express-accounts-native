@@ -1,23 +1,40 @@
 import { Dimensions } from "react-native";
 import { categories, currencies } from './constants'
 import React , {Component} from "react"
+// import { months } from './constants'
 
 const screenWidth = Dimensions.get("window").width;
 
+const monthMap = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
 import {
   PieChart,
+  BarChart
 } from "react-native-chart-kit";
 
-const chartConfig = {
-    backgroundGradientFrom: "#1E2923",
-    backgroundGradientFromOpacity: 0,
-    backgroundGradientTo: "#08130D",
-    backgroundGradientToOpacity: 0.5,
-    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-    strokeWidth: 10, // optional, default 3
-    barPercentage: 10,
-    useShadowColorFromDataset: false // optional
-  };
+const chartConfig={
+  backgroundColor: 'white',
+  backgroundGradientFrom: 'white',
+  backgroundGradientTo: 'white',
+  decimalPlaces: 0, // optional, defaults to 2dp
+  color: (opacity = 1) => 'black',
+  style: {
+    borderRadius: 16
+  }
+}
 
 export function makeCategoryChart (data) {
   return (
@@ -51,6 +68,23 @@ export function makeCurrencyChart (data) {
     hasLegend={true}
   />
   );
+}
+
+export function makeMonthlyChart (data) {
+
+  return (
+    <BarChart
+      // style={graphStyle}
+      data={monthList(data)}
+      width={screenWidth*0.85}
+      height={185}
+      fromZero={true}
+      yAxisLabel={'£'}
+      chartConfig={chartConfig}
+    />
+
+  )
+
 }
 
 
@@ -135,6 +169,70 @@ function currencyDataMaker (data) {
   
   return data
 }
+
+export function monthList (receipts)  {
+  
+  // get the current month and year
+    var currentMonth = new Date().getMonth()
+    var currentYear = new Date().getFullYear()
+            
+    var months = [currentMonth]
+    var month
+        
+    var years = [currentYear]
+    var year
+        
+    for (let i = 1; i < 5; i++) {
+      
+      month = currentMonth - i
+      
+      if (month >= 0) {
+      
+        months.unshift(month)
+        years.unshift(currentYear)
+      
+      } else {
+      
+        months.unshift(13 + month)
+        years.unshift(currentYear - 1)
+      
+      }
+    }
+    
+    var monthNames = months.map(function(e, i){ 
+      return monthMap[e] });
+    
+    var monthlyTotals = [0, 0, 0, 0, 0]
+    for (let i = 0; i < receipts.length; i++) {
+
+      var receipt = receipts[i]
+
+      if (receipt.currency === 0) {
+        var receiptMonth = receipt.date.toDate().getMonth()
+        var receiptYear = receipt.date.toDate().getFullYear()
+
+        for (let j = 0; j < monthlyTotals.length; j++) {
+
+          var checkMonth = months[j]
+          var checkYear = years[j]
+
+          if (receiptMonth === checkMonth && receiptYear === checkYear) {
+            monthlyTotals[j] +=  receipt.amount
+          }
+
+        }
+
+      }
+    }
+
+    return {
+      labels: monthNames,
+      datasets: [{
+        data: monthlyTotals
+      }]
+    }
+
+} 
 
 
 // determine if a date is later than 5th of april

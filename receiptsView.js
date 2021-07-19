@@ -7,7 +7,7 @@ import logo from './logo.png'
 import Receipts from './Receipts'
 import { categories, months } from './constants'
 import { screenWidth } from './extras'
-import { makeCategoryChart, makeCurrencyChart } from './graphStuff'
+import { makeCategoryChart, makeCurrencyChart, makeMonthlyChart } from './graphStuff'
 import {financialYear} from './utils'
 import {firestoreRefs} from './fireStoreRefs'
 import { Table, TableWrapper, Row } from 'react-native-table-component';
@@ -82,37 +82,34 @@ class ReceiptsView extends Component{
       numberReceipts =  <Text style={styles.label}>You have saved a total of {this.state.receipts} receipts</Text> 
       firstReceiptMessage = <Text style={styles.message}>First receipt was dated {this.dateFormat(this.state.firstReceiptDate)} and submitted on {this.dateFormat(this.state.firstReceiptSubmitDate)}</Text>
       latestReceiptMessage = <Text style={styles.message}>Latest receipt was dated {this.dateFormat(this.state.latestReceiptDate)} and submitted on {this.dateFormat(this.state.latestReceiptSubmitDate)}</Text>
-      graphs = <View style = {{marginTop: 10}}>        
+      
+      graphs = <View style = {{marginTop: 10}}>      
+                    <TouchableOpacity
+                        style = {styles.moreInfoButton}
+                        onPress = {this.receiptList}>
+                      <Text style = {styles.moreInfoText}> Full List </Text>
+                     </TouchableOpacity>  
+
                   <Text style={styles.label2}>Pounds Sterling - Category Breakdown </Text>
-                  <View style= {styles.graph}>
+                  <TouchableOpacity style= {styles.graph} onPress={() => this.setState({showPoundsSummaryList: !this.state.showPoundsSummaryList})}>
+                   
+
+                  { this.state.showPoundsSummaryList ?  this.categoryTable() : makeCategoryChart(this.state.categoryTotals)}
+
+                  </TouchableOpacity>
 
 
-                  <Picker onValueChange={0} style={styles.label2} selectedValue={0}>
-                  <Picker.Item label={"Chart"} value={false} key={0}/>
-                  </Picker>
+
+                    <Text style={styles.label2}>Totals per Month</Text>
+                    <TouchableOpacity style= {styles.graph} 
+                    // onPress={() => x = 3} 
+                    >
 
 
-                    {/* {makeCategoryChart(this.state.categoryTotals)} */}
-
-                    {this.categoryTable()}
+                    {makeMonthlyChart(this.state.receiptDetails)}
                     
 
-                  </View>
-
-                         <TouchableOpacity
-                            style = {styles.moreInfoButton}
-                            onPress = {this.receiptList}>
-            <               Text style = {styles.moreInfoText}> Full List </Text>
-                          </TouchableOpacity>
-
-                    <Text style={styles.label2}>Currency Breakdown</Text>
-                    <View style= {styles.graph}>
-
-
-                    {makeCurrencyChart(this.state.currencyCount)}
-                    
-
-                  </View>
+                  </TouchableOpacity>
       </View>
     }
 
@@ -154,6 +151,10 @@ class ReceiptsView extends Component{
 
     
   }
+
+ 
+
+
 
   receiptListModal = () => {
 
@@ -229,7 +230,7 @@ categoryTable () {
   return (
 
     <ScrollView horizontal={true}>
-    <View style={{width: "100%", marginTop: 100}}>
+    <View style={{width: "100%"}}>
 
       <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
         <Row data={['Category', "Amount"]} widthArr={widthArr2} style={styles.header} textStyle={styles.text}/>
@@ -243,9 +244,7 @@ categoryTable () {
                 data={rowData}
                 widthArr={widthArr2}
                 style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
-                textStyle={styles.text}
-                onPress={() => {console.log(index)}}
-              />
+                textStyle={styles.text}/>
             ))
           }
         </Table>
@@ -261,6 +260,7 @@ categoryTable () {
 
   componentDidMount(){
         
+    console.log("componentDidMount")
     var UserID = fire.auth().currentUser.uid
     
     firestoreRefs(UserID).userLogReceipts.get().then((doc) => {
