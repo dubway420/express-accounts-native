@@ -1,5 +1,5 @@
 import React , {Component} from "react"
-import { Button, SafeAreaView, ScrollView, Image, Text, View, TextInput, TouchableOpacity, LogBox, Alert } from "react-native";
+import { Button, SafeAreaView, ScrollView, Image, Text, View, TextInput, TouchableOpacity, LogBox, Alert, Dimensions } from "react-native";
 import {Picker} from '@react-native-picker/picker'
 import fire from './fire'
 import {styles} from './styles'
@@ -20,6 +20,7 @@ import CheckBox from '@react-native-community/checkbox';
 import {saveReceipt} from './saveReceipt'
 import ReceiptsView from './receiptsView'
 import { ConfirmDialog } from 'react-native-simple-dialogs';
+
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
 LogBox.ignoreLogs([`Setting a timer for a long period`]);
@@ -141,8 +142,8 @@ class Receipts extends Component{
 
   takePhoto = async () => {
     let pickerResult = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [3, 4],
+      // allowsEditing: true,
+      // aspect: [3, 4],
       base64: true
     });
 
@@ -152,8 +153,8 @@ class Receipts extends Component{
   pickImage = async () => {
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [3, 4],
+      // allowsEditing: true,
+      // aspect: [3, 4],
       base64: true
     });
 
@@ -443,8 +444,11 @@ class Receipts extends Component{
                     }}
                 />
 
-                  <Modal style={{margin: 0}} visible={this.state.showImage}>
-                    <SafeAreaView style={{width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+                  <Modal 
+                    style={{margin: 0}} 
+                    visible={this.state.showImage}
+                    backdropOpacity={0.3}  >
+                    <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
                       
 
                       {this.state.analysing && <Text> Analysing - please wait... </Text> }
@@ -467,7 +471,7 @@ class Receipts extends Component{
 
 
                   <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
-                    <SafeAreaView style={{width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+                    <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
                       
                             <Image source={{uri: this.state.imageToDisplay}}
                             style={{width: "80%", height: "65%", paddingVertical: 20}} />
@@ -501,9 +505,15 @@ class Receipts extends Component{
 
                   <Text style={styles.label}>Date of transaction</Text>
                     
-                  <Text onPress={this.showDatePicker} style={styles.dateInput}>{this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()}</Text>
+                  {/* <Text onPress={this.showDatePicker} style={styles.dateInput}>{this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()}</Text> */}
                     {/* <Icon onPress={this.showDatePicker} name={'caret-down'} size={15} color={'grey'}/> */}
                   
+                    <TouchableOpacity
+                          style={styles.dateInput}
+                          onPress = {this.showDatePicker}>
+                          <Text > {this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()} </Text>
+                      </TouchableOpacity>
+
 
                   {this.state.showDate && <DateTimePicker
                     testID="dateTimePicker"
@@ -537,27 +547,29 @@ class Receipts extends Component{
                   </View>
 
                   <Text style={styles.label}>Add Photos</Text>
-
-                  <TouchableOpacity
-                    style = {styles.photoButton}
-                    onPress = {
-                        () => this.takePhoto()
-                    }>
-                    <Text style = {styles.submitButtonText}> Camera </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style = {styles.photoButton}
-                    onPress = {
-                        () => this.pickImage()
-                    }>
-                    <Text style = {styles.submitButtonText}> Upload </Text>
-                  </TouchableOpacity>
-
                   
+                  <View style={{width: "100%"}}>
+                    <TouchableOpacity
+                      style = {styles.photoButton}
+                      onPress = {
+                          () => this.takePhoto()
+                      }>
+                      <Text style = {styles.submitButtonText}> Camera </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style = {styles.photoButton}
+                      onPress = {
+                          () => this.pickImage()
+                      }>
+                      <Text style = {styles.submitButtonText}> Upload </Text>
+                    </TouchableOpacity>
+
+                  </View>
+
                   {photoPanel}
 
-                    
+                  
                   <TouchableOpacity
                     style = {styles.doneButton}
                     onPress = {
@@ -566,7 +578,7 @@ class Receipts extends Component{
                     <Text style = {styles.submitButtonText}> Complete </Text>
                   </TouchableOpacity>
 
-
+                  
                   <TouchableOpacity
                     style = {styles.utilityButton}
                     onPress = {
@@ -576,7 +588,7 @@ class Receipts extends Component{
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style = {styles.utilityButton}
+                    style = {styles.utilityButton2}
                     onPress = {
                         () => this.reset()
                     }>

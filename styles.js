@@ -126,7 +126,7 @@ export const styles = StyleSheet.create({
 
    },
    label2: {
-    paddingLeft: 15,
+    paddingLeft: 5,
     paddingTop: 5,
     width: "100%",
     textDecorationLine: 'underline',
@@ -149,24 +149,14 @@ export const styles = StyleSheet.create({
      alignItems: "center"
    },
    dateInput: {
-    flex:1,
-    // flexDirection: 'column',
-    // justifyContent: 'space-evenly',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 17,
-    backgroundColor: '#fff',
-    // margin: 15,
-    height: 35,
-    borderColor: '#61040f',
+    // backgroundColor: '#800020',
+    flex: 1,
     borderWidth: 1,
-    padding: 5,
-    paddingLeft: 10,
-    width: '40%',
-    backgroundColor: '#fff',
-    color: '#424242',
-    marginVertical:15,
-    marginRight: 15
+    padding: 10,
+    // margin: 5,
+    height: 40,
+    width: '90%',
+    marginRight: 15,
    },
    currencyBox: {
     //  flex: 1,
@@ -284,18 +274,29 @@ export const styles = StyleSheet.create({
       width: '90%'
    },
    photoButton: {
-    backgroundColor: '#800020',
+    backgroundColor: 'blue',
     padding: 10,
-    margin: 15,
-    height: 40,
-    width: '40%'
+    // marginLeft: 20,
+    // marginVertical:10,
+    // height: 40,
+    width: '35%',
+    // alignSelf: 'center',
  },
  utilityButton: {
   backgroundColor: '#800020',
   padding: 10,
-  margin: 15,
+  marginLeft: 20,
   height: 40,
-  width: '25%'
+  width: '45%',
+  borderWidth: 1
+},
+utilityButton2: {
+  backgroundColor: '#800020',
+  padding: 10,
+  // marginHorizontal: 20,
+  height: 40,
+  width: '45%',
+  borderWidth: 1
 },
    submitButtonText:{
       color: 'white',
@@ -352,9 +353,22 @@ doneButton: {
   textAlign: 'center',
   backgroundColor: '#800020',
   padding: 10,
-  margin: 30,
+  marginHorizontal: 20,
   height: 40,
-  width: '80%'
+  width: '90%'
+},
+moreInfoButton: {
+  // textAlign: 'center',
+  backgroundColor: 'blue',
+  padding: 10,
+  marginRight: 10,
+  marginBottom: 10,
+  height: 40,
+  // width: '95%'
+},
+moreInfoText:{
+  color: 'white',
+  textAlign: 'center'
 },
 
   });

@@ -64,7 +64,14 @@ export class Signup extends Component{
 
   emailHandler(email) {
 
-    this.setState({ email: email,
+
+    // if the last character of email is a space, remove it
+    if (email[email.length - 1] === ' ') {
+      email = email.substring(0, email.length - 1);
+    }
+
+    this.setState({
+      email: email.toLowerCase(),
                     email_valid: emailVerifier(email),
                     email_warn: false})
                 
@@ -206,6 +213,7 @@ export class Signup extends Component{
                     placeholder="Enter email address"
                     placeholderTextColor = "black"
                     autoCapitalize = "none"
+                    value={this.state.email}
                     onChangeText = {(email) => this.emailHandler(email)}/>
                 
                 

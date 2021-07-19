@@ -9,8 +9,8 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 
 var baseState = {
 
-  email : "test",
-  password : "test",
+  email : "",
+  password : "",
   password_see: false,
 
   fname: "",
@@ -27,8 +27,23 @@ class Login extends Component{
     super(props)
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
+    this.emailHandler = this.emailHandler.bind(this);
     
     this.state=baseState
+
+  }
+
+  emailHandler(email) {
+    
+    // if the last character of email is a space, remove it
+    if (email[email.length - 1] === ' ') {
+      email = email.substring(0, email.length - 1);
+    }
+
+    this.setState({
+      email: email.toLowerCase(),
+      error: false
+    })
 
   }
 
@@ -90,11 +105,12 @@ class Login extends Component{
                 placeholder="Enter email address"
                 placeholderTextColor = "black"
                 autoCapitalize = "none"
-                onChangeText = {(email) => { this.setState({ email: email, error: false})}}/>
+                value={this.state.email}
+                onChangeText = {this.emailHandler}/>
               
               <View style = {styles.inputAlt}>
                   
-                  <TextInput style={styles.inputAltInner}
+                <TextInput style={styles.inputAltInner}
                 underlineColorAndroid = "transparent"
                 type="password"
                 id="password"

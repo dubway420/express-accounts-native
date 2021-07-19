@@ -1,6 +1,6 @@
 import fire from './fire'
 import {currencies, categories} from './constants'
-import {userLogReceipts, userReceipts} from './fireStoreRefs'
+import {firestoreRefs} from './fireStoreRefs'
 
 var success = false
 
@@ -15,8 +15,12 @@ export function saveReceipt(currency, amount, date, category) {
     var currencyCount = new Array(currencies.length).fill(0);
     var currencyTotals = new Array(currencies.length).fill(0);
         
+    var UserID = fire.auth().currentUser.uid
 
-    userLogReceipts.get().then((doc) => {
+    // Get the current user's receipt data
+    firestoreRefs(UserID).userLogReceipts.get().then((doc) => {
+        
+        // If the user has existing receipt data, append to that
         if (doc.exists) {
 
             var data = doc.data()
@@ -38,7 +42,19 @@ export function saveReceipt(currency, amount, date, category) {
             currencyTotals = data.currencyTotals
             currencyTotals[currency] += amountFloat
 
-            userLogReceipts.update({
+            var receiptDetails = data.receiptDetails
+
+            var receiptCurrentDetails = {
+                    currency,
+                    amount: amountFloat,
+                    date,
+                    category,
+                    logged: new Date
+                }
+
+            receiptDetails.push(receiptCurrentDetails)
+
+            firestoreRefs(UserID).userLogReceipts.update({
                 receipts,
                 categoryCount,
                 categoryTotals,
@@ -47,18 +63,10 @@ export function saveReceipt(currency, amount, date, category) {
 
                 latestReceiptDate: date,
 
-                latestReceiptSubmitDate: new Date
+                latestReceiptSubmitDate: new Date,
+
+                receiptDetails
         
-            })
-
-            var receiptName = "R" + receipts
-
-            userReceipts.doc(receiptName).set({
-                currency,
-                amount: amountFloat,
-                date,
-                category,
-                logged: new Date
             }).then(() => {
         
                 return true
@@ -69,9 +77,11 @@ export function saveReceipt(currency, amount, date, category) {
 
 
 
+
+    // If the user has no receipt data, create a new document
     }else {
 
-    var receiptName = "R1"
+    // var receiptName = "R1"
 
     categoryCount[category] += 1
 
@@ -81,8 +91,16 @@ export function saveReceipt(currency, amount, date, category) {
 
     currencyCount[currency] += 1
     currencyTotals[currency] += amountFloat
+
+    receiptDetails = [{
+            currency,
+            amount: amountFloat,
+            date,
+            category,
+            logged: new Date
+        }]
     
-    userLogReceipts.set({
+    firestoreRefs(UserID).userLogReceipts.set({
         receipts: 1,
         categoryCount,
         categoryTotals,
@@ -91,18 +109,10 @@ export function saveReceipt(currency, amount, date, category) {
         firstReceiptDate: date,
         latestReceiptDate: date,
         firstReceiptSubmitDate: new Date,
-        latestReceiptSubmitDate: new Date
+        latestReceiptSubmitDate: new Date,
+        receiptDetails
 
-    })
-
-    userReceipts.doc(receiptName).set({
-        currency,
-        amount: amountFloat,
-        date,
-        category,
-        logged: new Date
-    })
-    .then(() => {
+    }).then(() => {
         
         return true
     })
@@ -110,10 +120,11 @@ export function saveReceipt(currency, amount, date, category) {
         
     });
 
+    
+
     }
     });
 
-    console.log(success)
- 
+  
 
 }
