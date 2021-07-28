@@ -5,14 +5,31 @@ import {styles} from './styles'
 import background from './background.jpg'
 import logo from './logo.png'
 import Receipts from './Receipts'
-import { categories, months } from './constants'
+import { categories, months, currencies } from './constants'
 import { screenWidth } from './extras'
-import { makeCategoryChart, makeCurrencyChart, makeMonthlyChart } from './graphStuff'
+import { makeCategoryChart, monthListFull, makeMonthlyChart } from './graphStuff'
 import {financialYear} from './utils'
 import {firestoreRefs} from './fireStoreRefs'
 import { Table, TableWrapper, Row } from 'react-native-table-component';
 import Modal from 'react-native-modal';
 import {Picker} from '@react-native-picker/picker'
+import { Dialog } from 'react-native-simple-dialogs';
+import Icon from 'react-native-vector-icons/FontAwesome'
+
+import ImageViewing from "./ImageViewing";
+import ImageList from "./components/ImageList";
+import ImageHeader from "./components/ImageHeader";
+import ImageFooter from "./components/ImageFooter";
+
+import { architecture } from "./data/architecture";
+import { travel } from "./data/travel";
+import { city } from "./data/city";
+import { food } from "./data/food";
+
+import { getImageSource } from './typescriptStuff'
+
+import get from "lodash/get";
+
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
 LogBox.ignoreLogs([`Setting a timer for a long period`]);
@@ -22,7 +39,9 @@ const widthArr = [screenWidth*0.2, screenWidth*0.2, screenWidth*0.35, screenWidt
 
 const widthArr2 = [screenWidth*0.45, screenWidth*0.4]
 
-class ReceiptsView extends Component{
+
+
+export class ReceiptsView extends Component{
   constructor(props){
     super(props)
 
@@ -45,14 +64,39 @@ class ReceiptsView extends Component{
         financialYear: financialYear(),
 
         showPoundsSummaryList: false,
+        showMonthlySummary: false,
+
+
         showReceiptsList: false,
 
+        receiptsSorted: [],
         receiptsList: [],
+        currentImageIndex: 0,
+        images: [],
+        imagesURLs: [],
+        imageVisible: false,
+
+        showReceiptDialogs: false,
+
+        currency: 0,
+        amount: 0,
+        category: 0,
+        date: new Date(),
+        logged: new Date(),
 
 
     };
 
   }
+
+  selectImages (images, index) {
+    this.setState({
+      currentImageIndex: index,
+      imageVisible: true
+    })
+  }
+
+
 
   dateFormat = (date) => {
     let convertedDate = date.toDate()
@@ -98,15 +142,13 @@ class ReceiptsView extends Component{
 
                   </TouchableOpacity>
 
-
-
                     <Text style={styles.label2}>Totals per Month</Text>
                     <TouchableOpacity style= {styles.graph} 
-                    // onPress={() => x = 3} 
+                    onPress={() => this.setState({showMonthlySummary: !this.state.showMonthlySummary})}
                     >
 
-
-                    {makeMonthlyChart(this.state.receiptDetails)}
+                    { this.state.showMonthlySummary ?  this.monthlyTable(this.state.receiptDetails) : makeMonthlyChart(this.state.receiptDetails)}
+                                      
                     
 
                   </TouchableOpacity>
@@ -146,7 +188,7 @@ class ReceiptsView extends Component{
 
     var receiptList = receipts.map((receipt) => this.convertReceipt(receipt)) 
 
-    this.setState({receiptsList: receiptList, showReceiptsList: true})
+    this.setState({receiptsList: receiptList, showReceiptsList: true, receiptsSorted: receipts})
  
 
     
@@ -162,13 +204,13 @@ class ReceiptsView extends Component{
       <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
       <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
         
-      <ScrollView horizontal={true}>
+      <ScrollView keyboardShouldPersistTaps='handled' horizontal={true}>
           <View>
 
             <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
               <Row data={tableHead} widthArr={widthArr} style={styles.header} textStyle={styles.text}/>
             </Table>
-            <ScrollView style={styles.dataWrapper}>
+            <ScrollView keyboardShouldPersistTaps='handled' style={styles.dataWrapper}>
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
                 {
                   this.state.receiptsList.map((rowData, index) => (
@@ -178,11 +220,57 @@ class ReceiptsView extends Component{
                       widthArr={widthArr}
                       style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
                       textStyle={styles.text}
-                      onPress={() => {console.log(index)}}
+                      onPress={() => {this.selectRow(index)}}
                     />
                   ))
                 }
               </Table>
+
+
+              <Dialog
+                  visible={this.state.showReceiptDialogs}
+                  title="Custom Dialog"
+                  onTouchOutside={() => this.setState({showReceiptDialogs: false})} >
+                  <View>
+
+                    <Text> Amount:    </Text>
+
+                    <ImageList
+                      images={this.state.imagesURLs}
+                      onPress={(index) => this.selectImages(travel, index)}
+                      shift={0.25}
+                    />
+
+                    <View style={{flexDirection: 'row'}}>
+                      <TouchableOpacity
+                        style = {styles.closeButton}
+                        onPress = {() => this.setState({showReceiptDialogs: false})}
+                        >
+                          <Text style = {styles.submitButtonText}> Close </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style = {styles.trashButton}
+                        onPress = {() => this.setState({showReceiptDialogs: false})}
+                        >
+                          
+                        <Icon name={"trash"} size={20} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+              </Dialog>
+
+              
+
+              <ImageViewing
+                      images={getImageSource(this.state.images)}
+                      imageIndex={this.state.currentImageIndex}
+                      presentationStyle="overFullScreen"
+                      visible={this.state.imageVisible}
+                      onRequestClose={() => this.setState({imageVisible: false})}
+                      // onLongPress={onLongPress}
+
+              />
 
             </ScrollView>
           </View>
@@ -229,13 +317,51 @@ categoryTable () {
 
   return (
 
-    <ScrollView horizontal={true}>
+    <ScrollView keyboardShouldPersistTaps='handled' horizontal={true}>
     <View style={{width: "100%"}}>
 
       <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
         <Row data={['Category', "Amount"]} widthArr={widthArr2} style={styles.header} textStyle={styles.text}/>
       </Table>
-      <ScrollView style={styles.dataWrapper}>
+      <ScrollView keyboardShouldPersistTaps='handled' style={styles.dataWrapper}>
+        <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+          {
+            data.map((rowData, index) => (
+              <Row
+                key={index}
+                data={rowData}
+                widthArr={widthArr2}
+                style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
+                textStyle={styles.text}/>
+            ))
+          }
+        </Table>
+
+        
+
+      </ScrollView>
+    </View>
+  </ScrollView>
+
+  )
+
+
+}
+
+monthlyTable () {
+
+  var data = monthListFull(this.state.receiptDetails)
+
+
+  return (
+
+    <ScrollView keyboardShouldPersistTaps='handled' horizontal={true}>
+    <View style={{width: "100%"}}>
+
+      <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+        <Row data={['Category', "Amount"]} widthArr={widthArr2} style={styles.header} textStyle={styles.text}/>
+      </Table>
+      <ScrollView keyboardShouldPersistTaps='handled' style={styles.dataWrapper}>
         <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
           {
             data.map((rowData, index) => (
@@ -259,6 +385,8 @@ categoryTable () {
 }
 
   componentDidMount(){
+
+    
         
     console.log("componentDidMount")
     var UserID = fire.auth().currentUser.uid
@@ -288,6 +416,7 @@ categoryTable () {
       }
     }) 
 
+    
 
   }
 
@@ -295,9 +424,25 @@ categoryTable () {
     this.setState({showReceiptsList: false})
   } 
 
+ selectRow = (index) => {
 
+  var receipt = this.state.receiptsSorted[index]
 
+  var imagesURLs = receipt.listURLs
 
+  var images = imagesURLs.map(function(e, i){return {title: ("Receipt " + (i+1)), thumbnail: e, original: e}})
+
+  this.setState({currency: receipt.currency,
+                 amount: receipt.amount,
+                 category: receipt.category,
+                 date: this.dateFormat(receipt.date),
+                 logged: this.dateFormat(receipt.logged),
+
+                 imagesURLs,
+                 images, 
+                 showReceiptDialogs: true})
+  
+ }
 
 
 

@@ -1,5 +1,5 @@
 import React , {Component} from "react"
-import { Button, SafeAreaView, ScrollView, Image, Text, View, TextInput, TouchableOpacity, LogBox, Alert, Dimensions } from "react-native";
+import { Button, Modal, SafeAreaView, ScrollView, Image, Text, View, TextInput, TouchableOpacity, LogBox, Alert, Dimensions } from "react-native";
 import {Picker} from '@react-native-picker/picker'
 import fire from './fire'
 import {styles} from './styles'
@@ -12,14 +12,14 @@ import {months, currencies, categories} from './constants'
 import * as ImagePicker from "expo-image-picker";
 import uuid from "uuid";
 // import Modal from 'modal-react-native-web';
-import Modal from 'react-native-modal';
+// import Modal from 'react-native-modal';
 import {callGoogleVisionAsync} from './vision'
 import extractData from './extractors'
 import DatePicker from 'react-mobile-datepicker'
 import CheckBox from '@react-native-community/checkbox';
 import {saveReceipt} from './saveReceipt'
 import ReceiptsView from './receiptsView'
-import { ConfirmDialog } from 'react-native-simple-dialogs';
+import { ConfirmDialog, ProgressDialog } from 'react-native-simple-dialogs';
 
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
@@ -54,10 +54,13 @@ var baseState = {
       dialogVisible: false,
       returnToView: false,
 
+      imageMethodMessage: false,
+      uploadingMessageShow: false,
+
       successMessage: "Receipt Successfully added to database"
   }
 
-class Receipts extends Component{
+export default class Receipts extends Component{
   constructor(props){
     super(props)
     // this.signOut = this.signOut.bind(this);
@@ -229,7 +232,7 @@ class Receipts extends Component{
                    imageToDisplay: this.state.images[index]
     })
 
-    console.log(this.state.displayPhoto)
+    // console.log(this.state.displayPhoto)
 
   }
 
@@ -254,17 +257,21 @@ class Receipts extends Component{
                 imageToDisplay: null})
   }
 
-  submitReceipt = () => {
+  submitReceipt = async () => {
 
     if (this.state.amountValid) {
-      var success = saveReceipt(this.state.currency, this.state.amount, this.state.date, this.state.category)
-
       
+      this.setState({
+        uploadingMessageShow: true
+      })
 
-        this.setState({
-          dialogVisible: true
-        })
-        
+      const success = await saveReceipt(this.state.currency, this.state.amount, this.state.date, this.state.category, this.state.images)
+
+      this.setState({
+        dialogVisible: true,
+        uploadingMessageShow: false
+      })
+      
       
     } else {
 
@@ -285,6 +292,20 @@ class Receipts extends Component{
 
     this.setState(baseState)
 
+  }
+
+
+  handleCamera = () => {
+    this.takePhoto();
+    this.setState({
+      imageMethodMessage: false})
+
+  }
+
+  handleUpload = () => {
+    this.pickImage();
+    this.setState({
+      imageMethodMessage: false})
   }
 
 
@@ -414,7 +435,7 @@ class Receipts extends Component{
             source={background}
             style={styles.large} />
 
-            <ScrollView style={styles.scrollView}>
+            <ScrollView keyboardShouldPersistTaps='handled' style={styles.scrollView}>
 
               {/* <ImageBackground source={background} style={styles.image}> */}
 
@@ -423,7 +444,7 @@ class Receipts extends Component{
               <Image style={styles.logo} source={logo} />
 
                 <View style = {styles.textContainer}>
-                  <Text style = {styles.text} >Welcome, {fire.auth().currentUser.displayName}</Text>
+                  <Text style = {styles.text} > Add new receipts here</Text>
                   
                 </View>
 
@@ -511,8 +532,9 @@ class Receipts extends Component{
                     <TouchableOpacity
                           style={styles.dateInput}
                           onPress = {this.showDatePicker}>
-                          <Text > {this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()} </Text>
-                      </TouchableOpacity>
+                          <Text style={{fontSize:15}} > {this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()} </Text>
+                          
+                    </TouchableOpacity>
 
 
                   {this.state.showDate && <DateTimePicker
@@ -546,28 +568,56 @@ class Receipts extends Component{
 
                   </View>
 
-                  <Text style={styles.label}>Add Photos</Text>
+                  <Text style={styles.label}>Images</Text>
                   
                   <View style={{width: "100%"}}>
                     <TouchableOpacity
                       style = {styles.photoButton}
                       onPress = {
-                          () => this.takePhoto()
+                          () => this.setState({imageMethodMessage: true})
                       }>
-                      <Text style = {styles.submitButtonText}> Camera </Text>
+                      <Text style = {styles.submitButtonText}> Add Image </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
-                      style = {styles.photoButton}
-                      onPress = {
-                          () => this.pickImage()
-                      }>
-                      <Text style = {styles.submitButtonText}> Upload </Text>
-                    </TouchableOpacity>
+                    <Modal 
+                      style={{margin: 0}} 
+                      visible={this.state.uploadingMessageShow}
+                      backdropOpacity={0}  >
+                      <SafeAreaView 
+                      style={{height: "50%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}
+                      >
+                        
+
+                        <Text> Uploading your receipt... </Text>
+                        <Image source={loading}/>
+                        
+
+
+                      </SafeAreaView>
+                    </Modal>
 
                   </View>
 
                   {photoPanel}
+
+                  <ConfirmDialog
+                    title={"Adding an image for this receipt"}
+                    message="Which method would you like to use to add a receipt image?"
+                    visible={this.state.imageMethodMessage}
+                    onTouchOutside={() => this.setState({imageMethodMessage: false})}
+                    positiveButton={{
+                        title: "Camera",
+                        onPress: () => this.handleCamera()
+                    }}
+                    negativeButton={{
+                        title: "Upload",
+                        onPress: () => this.handleUpload()
+                    }}
+                    cancelButton={{
+                        title: "Cancel",
+
+                    }}
+                  />
 
                   
                   <TouchableOpacity
@@ -598,7 +648,7 @@ class Receipts extends Component{
 
 
 
-                <Button onPress={this.signOut} title="Sign Out" />  
+                {/* <Button onPress={this.signOut} title="Sign Out" />   */}
 
               </View>  
 
@@ -617,32 +667,3 @@ class Receipts extends Component{
 
 }
 
-async function uploadImageAsync(uri) {
-  // Why are we using XMLHttpRequest? See:
-  // https://github.com/expo/expo/issues/2402#issuecomment-443726662
-  const blob = await new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      resolve(xhr.response);
-    };
-    xhr.onerror = function (e) {
-      console.log(e);
-      reject(new TypeError("Network request failed"));
-    };
-    xhr.responseType = "blob";
-    xhr.open("GET", uri, true);
-    xhr.send(null);
-  });
-
-  const ref = fire.storage().ref("userxyz").child(uuid.v4());
-  const snapshot = await ref.put(blob);
-
-  // We're done with the blob, close and release it
-  blob.close();
-
-  return await snapshot.ref.getDownloadURL();
-}
-
-
-
-export default Receipts;

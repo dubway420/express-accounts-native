@@ -152,11 +152,13 @@ export const styles = StyleSheet.create({
     // backgroundColor: '#800020',
     flex: 1,
     borderWidth: 1,
-    padding: 10,
+    paddingVertical: 10,
+    paddingLeft: 5,
     // margin: 5,
     height: 40,
     width: '90%',
     marginRight: 15,
+    marginVertical: 15
    },
    currencyBox: {
     //  flex: 1,
@@ -276,12 +278,32 @@ export const styles = StyleSheet.create({
    photoButton: {
     backgroundColor: 'blue',
     padding: 10,
-    // marginLeft: 20,
-    // marginVertical:10,
+    marginLeft: 20,
+    marginVertical:10,
     // height: 40,
     width: '35%',
     // alignSelf: 'center',
  },
+ closeButton: {
+  backgroundColor: 'blue',
+  padding: 10,
+  marginLeft: 10,
+  marginVertical:10,
+  // alignSelf: 'flex-start'
+  // height: 40,
+  // width: '35%',
+  // alignSelf: 'center',
+},
+ trashButton: {
+  backgroundColor: 'red',
+  padding: 10,
+  marginLeft: 10,
+  marginVertical:10,
+  alignSelf: 'flex-start'
+  // height: 40,
+  // width: '35%',
+  // alignSelf: 'center',
+},
  utilityButton: {
   backgroundColor: '#800020',
   padding: 10,

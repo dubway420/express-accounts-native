@@ -193,11 +193,12 @@ export function monthList (receipts)  {
       
       } else {
       
-        months.unshift(13 + month)
+        months.unshift(12 + month)
         years.unshift(currentYear - 1)
       
       }
     }
+
     
     var monthNames = months.map(function(e, i){ 
       return monthMap[e] });
@@ -234,6 +235,73 @@ export function monthList (receipts)  {
 
 } 
 
+export function monthListFull (receipts)  {
+  
+  // get the current month and year
+    var currentMonth = new Date().getMonth()
+    var currentYear = new Date().getFullYear()
+            
+    var months = [currentMonth]
+    var month
+        
+    var years = [currentYear]
+    var year
+        
+    for (let i = 1; i < 12; i++) {
+      
+      month = currentMonth - i
+      
+      if (month >= 0) {
+      
+        months.unshift(month)
+        years.unshift(currentYear)
+      
+      } else {
+      
+        months.unshift(12 + month)
+        years.unshift(currentYear - 1)
+      
+      }
+    }
+
+
+    
+    var monthNames = months.map(function(e, i){ 
+      return monthMap[e] });
+    
+    // a list of zeros 12 long
+    var monthlyTotals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    for (let i = 0; i < receipts.length; i++) {
+
+      var receipt = receipts[i]
+
+      if (receipt.currency === 0) {
+        var receiptMonth = receipt.date.toDate().getMonth()
+        var receiptYear = receipt.date.toDate().getFullYear()
+
+
+        for (let j = 0; j < monthlyTotals.length; j++) {
+
+          var checkMonth = months[j]
+          var checkYear = years[j]
+
+          if (receiptMonth === checkMonth && receiptYear === checkYear) {
+             monthlyTotals[j] +=  receipt.amount
+          }
+
+        }
+
+      }
+    }
+
+    var data = months.map(function(e, i){ 
+      return [monthMap[e] + " " + years[i], "£" + monthlyTotals[i]]});
+
+    return data
+
+} 
+
 
 // determine if a date is later than 5th of april
 function isAfterFifthApril(date) {
@@ -245,7 +313,7 @@ function isAfterFifthApril(date) {
     var newDate = new Date()
   
     var year = newDate.getFullYear()
-    console.log(year)
+    // console.log(year)
   
    
     if (isAfterFifthApril(newDate)) {

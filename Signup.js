@@ -146,7 +146,7 @@ export class Signup extends Component{
 
   signup() {
 
-    console.log("hello")
+    // console.log("hello")
     
     var verified = this.registrationVerification()
     
@@ -192,7 +192,7 @@ export class Signup extends Component{
           source={background}
           style={styles.large} />
 
-                <ScrollView style={styles.scrollView}>
+                <ScrollView keyboardShouldPersistTaps='handled' style={styles.scrollView}>
 
             <View style={styles.box}>
 

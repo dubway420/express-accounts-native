@@ -83,7 +83,7 @@ class Login extends Component{
           source={background}
           style={styles.large} />
 
-          <ScrollView style={styles.scrollView}>
+          <ScrollView keyboardShouldPersistTaps='handled' style={styles.scrollView}>
 
             {/* <ImageBackground source={background} style={styles.image}> */}
 
