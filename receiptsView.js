@@ -1,5 +1,5 @@
 import React , {Component} from "react"
-import { Button, SafeAreaView, ScrollView, Image, Text, View, Dimensions, TouchableOpacity, LogBox, Alert } from "react-native";
+import { Button, SafeAreaView, ScrollView, Image, Text, View, TextInput, TouchableOpacity, LogBox, Alert } from "react-native";
 import fire from './fire'
 import {styles} from './styles'
 import background from './background.jpg'
@@ -83,6 +83,15 @@ export class ReceiptsView extends Component{
         category: 0,
         date: new Date(),
         logged: new Date(),
+
+        showEditDialog: false,
+
+        editCurrency: null,
+        editAmount: null,
+        amountValid: false,
+        editCategory: null,
+        editDate: null,
+
 
 
     };
@@ -179,6 +188,16 @@ export class ReceiptsView extends Component{
   
   }
 
+  currencyItems() {
+    
+    return currencies.map((myValue, myIndex) => {
+      return(
+      <Picker.Item label={myValue.symbol} value={myIndex} key={myIndex}/>
+      )
+    });
+
+  }
+
   receiptList = () => {
 
     var receipts = this.state.receiptDetails
@@ -192,6 +211,53 @@ export class ReceiptsView extends Component{
  
 
     
+  }
+
+  onEdit = (value) => {
+
+    console.log(value)
+    this.setState({
+      showEditDialog: true,
+      showEditDialogType: value,
+    })
+  }
+
+  amountHandler(value) {
+
+    this.setState({
+      editAmount: value,
+      amountValid: !isNaN(value)
+    })
+
+  }
+
+  editDialog = () => {
+    
+    return (
+      <Dialog
+      visible={this.state.showEditDialog}
+      title="Edit"
+      onTouchOutside={() => this.setState({showEditDialog: false})} >
+      <View style={{flexDirection: "row", alignItems: "center"}}>
+      <Picker onValueChange={this.changeCurrency} style={styles.currencyBox} selectedValue={this.state.currency}>
+                {this.currencyItems()}
+              </Picker>
+
+              <TextInput style = {styles.currencyInput}
+                    underlineColorAndroid = "transparent"
+                    type="number"
+                    id="value"
+                    name="vaue"
+                    value={String(this.state.amount)}
+                    keyboardType="numeric"
+                    placeholder="Value"
+                    placeholderTextColor = "black"
+                    autoCapitalize = "none"
+                    onChangeText = {(amount) => this.amountHandler(amount)}/>
+      </View>
+
+    </Dialog>
+    )
   }
 
  
@@ -229,12 +295,56 @@ export class ReceiptsView extends Component{
 
               <Dialog
                   visible={this.state.showReceiptDialogs}
-                  title="Custom Dialog"
+                  title="Receipt Details"
                   onTouchOutside={() => this.setState({showReceiptDialogs: false})} >
                   <View>
 
-                    <Text> Amount:    </Text>
+                  <Text> Amount: </Text>
+                  <View style={{flexDirection: 'row', marginBottom: 10}}>
+                    <Text style={{width: "50%"}}> {currencies[this.state.currency].symbol}{this.state.amount}</Text>
+                    <TouchableOpacity
+                      // style = {styles.trashButton}
+                      onPress = {() => this.setState({showReceiptDialogs: false})}
+                      >
+                        
+                      <Icon onPress={() => this.onEdit(1)} style={{marginLeft: 10}} name={"edit"} size={20} />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  <Text style={{width: "50%"}}> Date of transaction: </Text>
+                  <View style={{flexDirection: 'row', marginBottom: 10}}>
+                    
+                    <Text style={{width: "50%"}}> {this.state.date}</Text>  
 
+                    <TouchableOpacity
+                      // style = {styles.trashButton}
+                      onPress = {() => this.setState({showReceiptDialogs: false})}
+                      >
+                        
+                      <Icon onPress={() => this.onEdit(2)} style={{marginLeft: 10}} name={"edit"} size={20} />
+                    </TouchableOpacity>
+                    
+                  </View>
+
+                  
+                  <Text style={{width: "50%"}}> Category: </Text>
+                  <View style={{flexDirection: 'row', marginBottom: 10}}>  
+                    <Text style={{width: "50%"}}> {categories[this.state.category].name}</Text>
+
+                    <TouchableOpacity
+                      // style = {styles.trashButton}
+                      onPress = {() => this.setState({showReceiptDialogs: false})}
+                      >
+                        
+                      <Icon onPress={() => this.onEdit(3)} style={{marginLeft: 10}} name={"edit"} size={20} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <Text style={{width: "50%"}}> Logged on: </Text>
+                  <View style={{flexDirection: 'row', marginBottom: 10}}>  
+                    <Text style={{width: "50%"}}> {this.state.logged}</Text>
+                  </View>
+                      
                     <ImageList
                       images={this.state.imagesURLs}
                       onPress={(index) => this.selectImages(travel, index)}
@@ -275,6 +385,8 @@ export class ReceiptsView extends Component{
             </ScrollView>
           </View>
         </ScrollView>
+
+        {this.editDialog()}
 
         <TouchableOpacity
           style = {styles.photoButton}
