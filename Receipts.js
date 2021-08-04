@@ -539,7 +539,7 @@ export default class Receipts extends Component{
 
                   {this.state.showDate && <DateTimePicker
                     testID="dateTimePicker"
-                    value={new Date()}
+                    value={this.state.date}
                     // mode={mode}
                     is24Hour={true}
                     display="default"

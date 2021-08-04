@@ -63,7 +63,8 @@ export async function saveReceipt (currency, amount, date, category, images) {
                 date,
                 category,
                 logged: new Date,
-                listURLs
+                listURLs,
+                updated: null
             }
 
         receiptDetails.push(receiptCurrentDetails)
@@ -114,7 +115,8 @@ export async function saveReceipt (currency, amount, date, category, images) {
             date,
             category,
             logged: new Date,
-            listURLs
+            listURLs,
+            updated: null
         }]
 
 

@@ -15,6 +15,7 @@ import Modal from 'react-native-modal';
 import {Picker} from '@react-native-picker/picker'
 import { Dialog } from 'react-native-simple-dialogs';
 import Icon from 'react-native-vector-icons/FontAwesome'
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import ImageViewing from "./ImageViewing";
 import ImageList from "./components/ImageList";
@@ -51,14 +52,17 @@ export class ReceiptsView extends Component{
 
         addReceipt: false,
         receipts: 0,
+
         categoryCount: [],
         categoryTotals: [],
         currencyCount: [],
         currencyTotals: [],
+
         firstReceiptDate: null,
         firstReceiptSubmitDate: null,
         latestReceiptDate: null,
         latestReceiptSubmitDate: null,
+
         receiptDetails: [],
 
         financialYear: financialYear(),
@@ -76,23 +80,32 @@ export class ReceiptsView extends Component{
         imagesURLs: [],
         imageVisible: false,
 
+        updated: null,
+
         showReceiptDialogs: false,
 
         currency: 0,
         amount: 0,
         category: 0,
         date: new Date(),
+        convertedDate: new Date,
         logged: new Date(),
 
         showEditDialog: false,
 
+        tempCurrency: null,
+        tempAmount: null,
+        amountValid: false,
+        tempCategory: null,
+
         editCurrency: null,
         editAmount: null,
-        amountValid: false,
         editCategory: null,
         editDate: null,
 
+        showUpdateButton: false,
 
+        editSaved: false
 
     };
 
@@ -215,7 +228,7 @@ export class ReceiptsView extends Component{
 
   onEdit = (value) => {
 
-    console.log(value)
+
     this.setState({
       showEditDialog: true,
       showEditDialogType: value,
@@ -225,46 +238,314 @@ export class ReceiptsView extends Component{
   amountHandler(value) {
 
     this.setState({
-      editAmount: value,
-      amountValid: !isNaN(value)
+      tempAmount: value,
+      amountValid: !isNaN(value),
+      showUpdateButton: true
     })
 
   }
 
-  editDialog = () => {
+  categoryItems() {
     
-    return (
-      <Dialog
-      visible={this.state.showEditDialog}
-      title="Edit"
-      onTouchOutside={() => this.setState({showEditDialog: false})} >
-      <View style={{flexDirection: "row", alignItems: "center"}}>
-      <Picker onValueChange={this.changeCurrency} style={styles.currencyBox} selectedValue={this.state.currency}>
-                {this.currencyItems()}
-              </Picker>
+    return categories.map((myValue, myIndex) => {
+      return(
+      <Picker.Item label={myValue.name} value={myIndex} key={myIndex}/>
+      )
+    });
 
-              <TextInput style = {styles.currencyInput}
-                    underlineColorAndroid = "transparent"
-                    type="number"
-                    id="value"
-                    name="vaue"
-                    value={String(this.state.amount)}
-                    keyboardType="numeric"
-                    placeholder="Value"
-                    placeholderTextColor = "black"
-                    autoCapitalize = "none"
-                    onChangeText = {(amount) => this.amountHandler(amount)}/>
-      </View>
+  } 
 
-    </Dialog>
-    )
+  changeCategory = (itemValue, itemIndex) => {
+
+    this.setState({tempCategory: itemIndex,
+                   showUpdateButton: true})
+
+  }
+  
+  changeCurrency = (itemValue, itemIndex) => {
+
+    this.setState({tempCurrency: itemIndex,
+                   showUpdateButton: true
+    })
+
   }
 
- 
+  closeDialog = () => {
+    if (this.state.showEditDialogType === 1) {
+      this.setState({
+        showEditDialog: false,
+        tempCurrency: null,
+        tempAmount: null,
+
+      }) }
+
+    else {
+
+      this.setState({
+        showEditDialog: false,
+        tempCategory: null,
+        showUpdateButton: false,
+
+      }) 
 
 
+    }  
+
+  }
+
+  updateButton = () => {
+  
+    if (this.state.showEditDialogType === 1) {
+    this.setState({
+      showEditDialog: false,
+      showUpdateButton: false,
+      editCurrency: this.state.tempCurrency,
+      editAmount: this.state.tempAmount,
+      editSaved: true
+
+    })}
+
+    else {
+      this.setState({
+        showEditDialog: false,
+        showUpdateButton: false,
+        editCategory: this.state.tempCategory,
+        editSaved: true
+      })
+    }
+
+  }
+
+  dateChange = (event, selectedDate) => {
+    
+    if (event.type === "set") {
+      this.setState({editDate: selectedDate, 
+                     showEditDialog: false,
+                     editSaved: true})}
+    else {
+      this.setState({showEditDialog: false})}
+      
+  };
+
+  editDialog = () => {
+    
+    if (this.state.showEditDialogType === 1) {
+
+      var currency_val 
+      if (this.state.tempCurrency !== null) {
+        currency_val = this.state.tempCurrency
+      } else if (this.state.editCurrency !== null) {
+        currency_val = this.state.editCurrency 
+      } else {
+        currency_val = this.state.currency
+      }
+
+      var amount_val
+      if (this.state.tempAmount !== null) {
+        amount_val = this.state.tempAmount
+      } else if (this.state.editAmount !== null) {
+        amount_val = this.state.editAmount
+      } else {
+        amount_val = this.state.amount
+      }   
+
+
+
+      return (
+        <Dialog
+        visible={this.state.showEditDialog}
+        title="Edit Amount"
+        onTouchOutside={this.closeDialog} >
+        <View style={{flexDirection: "row", alignItems: "center"}}>
+          <Picker onValueChange={this.changeCurrency} style={styles.currencyBox} selectedValue={currency_val}>
+                    {this.currencyItems()}
+                  </Picker>
+    
+          <TextInput style = {styles.currencyInput}
+                underlineColorAndroid = "transparent"
+                type="number"
+                id="value"
+                name="value"
+                value={String(amount_val)}
+                keyboardType="numeric"
+                placeholder="Value"
+                placeholderTextColor = "black"
+                autoCapitalize = "none"
+                onChangeText = {(amount) => this.amountHandler(amount)}/>
+
+          </View>
+
+          <View style={{flexDirection: "row", alignItems: "center"}}>
+
+          <TouchableOpacity
+                    style = {styles.photoButton}
+                    onPress = {this.closeDialog}
+                    >
+                      <Text style = {styles.submitButtonText}> Close </Text>
+                  </TouchableOpacity>
+
+          {this.state.showUpdateButton && <TouchableOpacity
+                    style = {styles.photoButton}
+                    onPress = {this.updateButton}
+                    >
+                      <Text style = {styles.submitButtonText}> Update </Text>
+                  </TouchableOpacity>}              
+
+
+
+        </View>
+  
+      </Dialog>
+      )
+      
+    } else if (this.state.showEditDialogType === 2) {
+
+      var date
+      if (this.state.editDate) {
+      
+        date = this.state.editDate
+
+      } else {
+
+        date = this.state.convertedDate
+
+      } 
+
+      if (this.state.showEditDialog) {
+      return (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={date}
+          // mode={mode}
+          is24Hour={true}
+          display="default"
+          visible={this.state.showEditDialog}
+          onChange={this.dateChange}
+        />
+      ) }
+    } else if (this.state.showEditDialogType === 3) {
+
+      var category_val
+      if (  this.state.tempCategory !== null) {
+        category_val = this.state.tempCategory
+      } else if (this.state.editCategory !== null) {
+        category_val = this.state.editCategory
+      } else {
+        category_val = this.state.category
+      } 
+
+      return (
+        <Dialog
+        visible={this.state.showEditDialog}
+        title="Edit Category"
+        onTouchOutside={this.closeDialog} >
+          <View style={styles.categoryInput}>
+
+            <Picker onValueChange={this.changeCategory} style={styles.categoryBox} selectedValue={category_val}>
+              {this.categoryItems()}
+
+            </Picker>
+
+            </View>
+
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+
+            <TouchableOpacity
+                      style = {styles.photoButton}
+                      onPress = {this.closeDialog}
+                      >
+                        <Text style = {styles.submitButtonText}> Close </Text>
+                    </TouchableOpacity>
+
+            {this.state.showUpdateButton && <TouchableOpacity
+                      style = {styles.photoButton}
+                      onPress = {this.updateButton}
+                      >
+                        <Text style = {styles.submitButtonText}> Update </Text>
+                    </TouchableOpacity>}              
+
+
+
+            </View>
+        </Dialog>
+      )
+    }
+
+
+
+  }
 
   receiptListModal = () => {
+
+    // ====== AMOUNT =========
+    var amount_line
+    if (this.state.editCurrency) {
+
+      amount_line = currencies[this.state.editCurrency].symbol
+
+    } else {
+
+      amount_line = currencies[this.state.currency].symbol
+
+    }
+
+    if (this.state.editAmount) {
+
+      amount_line += this.state.editAmount
+
+    } else {
+
+      amount_line += this.state.amount
+
+    }
+
+    var amount_style 
+    if (this.state.editCurrency || this.state.editAmount) {
+
+      amount_style = {width: "50%", color: 'green'}
+
+    } else {
+
+      amount_style = {width: "50%"}
+
+    }
+
+    // ====== DATE =========
+
+    var date, date_style
+    if (this.state.editDate) {
+      
+      var dateRaw = this.state.editDate
+
+      let month = months[dateRaw.getMonth()];
+      let day = dateRaw.getDate();
+      let year = dateRaw.getFullYear();
+  
+      // console.log(date)
+  
+      date = `${day} ${month} ${year}`;
+
+
+      date_style = {width: "50%", color: 'green'}
+
+    } else {
+
+      date = this.state.date
+      date_style = {width: "50%"}
+
+    }
+
+    // ====== CATEGORY =========
+
+    var category_val, category_style
+    if (this.state.editCategory !== null) {
+      category_val = categories[this.state.editCategory].name
+      category_style = {width: "50%", color: 'green'}
+    } else {
+      category_val = categories[this.state.category].name
+      category_style = {width: "50%"}
+    } 
+
 
     return (
       <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
@@ -301,7 +582,7 @@ export class ReceiptsView extends Component{
 
                   <Text> Amount: </Text>
                   <View style={{flexDirection: 'row', marginBottom: 10}}>
-                    <Text style={{width: "50%"}}> {currencies[this.state.currency].symbol}{this.state.amount}</Text>
+                    <Text style={amount_style}> {amount_line}</Text>
                     <TouchableOpacity
                       // style = {styles.trashButton}
                       onPress = {() => this.setState({showReceiptDialogs: false})}
@@ -314,7 +595,7 @@ export class ReceiptsView extends Component{
                   <Text style={{width: "50%"}}> Date of transaction: </Text>
                   <View style={{flexDirection: 'row', marginBottom: 10}}>
                     
-                    <Text style={{width: "50%"}}> {this.state.date}</Text>  
+                    <Text style={date_style}> {date}</Text>  
 
                     <TouchableOpacity
                       // style = {styles.trashButton}
@@ -329,7 +610,7 @@ export class ReceiptsView extends Component{
                   
                   <Text style={{width: "50%"}}> Category: </Text>
                   <View style={{flexDirection: 'row', marginBottom: 10}}>  
-                    <Text style={{width: "50%"}}> {categories[this.state.category].name}</Text>
+                    <Text style={category_style}> {category_val}</Text>
 
                     <TouchableOpacity
                       // style = {styles.trashButton}
@@ -352,9 +633,21 @@ export class ReceiptsView extends Component{
                     />
 
                     <View style={{flexDirection: 'row'}}>
+
+                      {this.state.editSaved && 
+                      
+                        <TouchableOpacity
+                          style = {styles.closeButton}
+                          onPress = {() => this.setState({showReceiptDialogs: false})}
+                          >
+                            <Text style = {styles.submitButtonText}> Update </Text>
+                        </TouchableOpacity> 
+
+                      }
+
                       <TouchableOpacity
                         style = {styles.closeButton}
-                        onPress = {() => this.setState({showReceiptDialogs: false})}
+                        onPress = {this.closeReceipt}
                         >
                           <Text style = {styles.submitButtonText}> Close </Text>
                       </TouchableOpacity>
@@ -366,6 +659,7 @@ export class ReceiptsView extends Component{
                           
                         <Icon name={"trash"} size={20} />
                       </TouchableOpacity>
+
                     </View>
                   </View>
               </Dialog>
@@ -534,7 +828,21 @@ monthlyTable () {
 
  closeModal = () => {
     this.setState({showReceiptsList: false})
-  } 
+ }
+ 
+ closeReceipt = () => {
+ 
+  this.setState({showReceiptDialogs: false,
+                 editCurrency: null,
+                 editAmount: null,
+                 amountValid: false,
+                 editCategory: null,
+                 editDate: null,
+                 showUpdateButton: false,
+                 editSaved: false
+                })
+
+} 
 
  selectRow = (index) => {
 
@@ -544,10 +852,12 @@ monthlyTable () {
 
   var images = imagesURLs.map(function(e, i){return {title: ("Receipt " + (i+1)), thumbnail: e, original: e}})
 
-  this.setState({currency: receipt.currency,
+  this.setState({receiptIndex: index, 
+                 currency: receipt.currency,
                  amount: receipt.amount,
                  category: receipt.category,
                  date: this.dateFormat(receipt.date),
+                 convertedDate: receipt.date.toDate(),
                  logged: this.dateFormat(receipt.logged),
 
                  imagesURLs,
@@ -556,11 +866,30 @@ monthlyTable () {
   
  }
 
+ updateReceipt = () => {
+
+  var receiptsAll = this.state.receiptsSorted
+
+  if (this.state.editCurrency) {
+    receiptsAll[this.state.receiptIndex].currency = this.state.editCurrency}
+  if (this.state.editAmount) {
+    receiptsAll[this.state.receiptIndex].amount = this.state.editAmount}
+
+  receiptsAll[this.state.receiptIndex].category = this.state.editCategory
+  
+  receiptsAll[this.state.receiptIndex].date = this.state.editDate
+  
+ 
+
+
+}
+
 
 
   render() {
     
     console.log("render")
+    console.log(this.state.tempCategory)
 
     if (this.state.addReceipt) {
       
@@ -572,7 +901,7 @@ monthlyTable () {
 
         return(
             
-            <SafeAreaView style={styles.outerContainer}>
+            <SafeAreaView keyboardShouldPersistTaps='handled' style={styles.outerContainer}>
 
             <Image
             source={background}
