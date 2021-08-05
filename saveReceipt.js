@@ -44,8 +44,9 @@ export async function saveReceipt (currency, amount, date, category, images) {
         categoryCount = data.categoryCount
         categoryCount[category] += 1
 
+        categoryTotals = data.categoryTotals
         if (currency === 0) {
-            categoryTotals = data.categoryTotals
+            
             categoryTotals[category] += amountFloat
         }
 

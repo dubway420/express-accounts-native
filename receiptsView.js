@@ -90,6 +90,7 @@ export class ReceiptsView extends Component{
         date: new Date(),
         convertedDate: new Date,
         logged: new Date(),
+        updated: null,
 
         showEditDialog: false,
 
@@ -621,11 +622,19 @@ export class ReceiptsView extends Component{
                     </TouchableOpacity>
                   </View>
 
-                  <Text style={{width: "50%"}}> Logged on: </Text>
-                  <View style={{flexDirection: 'row', marginBottom: 10}}>  
-                    <Text style={{width: "50%"}}> {this.state.logged}</Text>
-                  </View>
-                      
+                  <View style={{flexDirection: 'row', width: "100%"}}>
+
+                    <Text> Logged: </Text>
+                    <View style={{flexDirection: 'row', marginBottom: 10}}>  
+                      <Text style={{width: "40%"}}> {this.state.logged}</Text>
+                    </View>
+
+                    { this.state.updated && 
+                    <><Text> Updated: </Text><View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                          <Text style={{ width: "40%" }}> {this.state.logged}</Text>
+                        </View></>}
+
+                  </View>    
                     <ImageList
                       images={this.state.imagesURLs}
                       onPress={(index) => this.selectImages(travel, index)}
@@ -638,9 +647,9 @@ export class ReceiptsView extends Component{
                       
                         <TouchableOpacity
                           style = {styles.closeButton}
-                          onPress = {() => this.setState({showReceiptDialogs: false})}
+                          onPress = {this.updateReceipt}
                           >
-                            <Text style = {styles.submitButtonText}> Update </Text>
+                            <Text style = {styles.submitButtonText}> Save Changes </Text>
                         </TouchableOpacity> 
 
                       }
@@ -852,6 +861,14 @@ monthlyTable () {
 
   var images = imagesURLs.map(function(e, i){return {title: ("Receipt " + (i+1)), thumbnail: e, original: e}})
 
+  var updated
+  if (receipt.updated) {
+    updated = this.dateFormat(receipt.updated)
+  } else {
+    updated = null
+  }
+
+
   this.setState({receiptIndex: index, 
                  currency: receipt.currency,
                  amount: receipt.amount,
@@ -859,6 +876,7 @@ monthlyTable () {
                  date: this.dateFormat(receipt.date),
                  convertedDate: receipt.date.toDate(),
                  logged: this.dateFormat(receipt.logged),
+                 updated: updated,
 
                  imagesURLs,
                  images, 
@@ -870,16 +888,81 @@ monthlyTable () {
 
   var receiptsAll = this.state.receiptsSorted
 
-  if (this.state.editCurrency) {
-    receiptsAll[this.state.receiptIndex].currency = this.state.editCurrency}
-  if (this.state.editAmount) {
-    receiptsAll[this.state.receiptIndex].amount = this.state.editAmount}
+  // Only changes if currency is changing
+  var currencyCount = this.state.currencyCount
+  var currencyTotals = this.state.currencyTotals
 
-  receiptsAll[this.state.receiptIndex].category = this.state.editCategory
+  // Only changes if category is changing
+  var categoryCount = this.state.categoryCount
+
+  // Changes if 1) category is changing, or 2) currency is changing from/to 0
+  var categoryTotals = this.state.categoryTotals
+
+  if (this.state.editCurrency) {
+    receiptsAll[this.state.receiptIndex].currency = this.state.editCurrency
+
+    currencyCount[this.state.editCurrency] = currencyCount[this.state.editCurrency] + 1
+    currencyTotals[this.state.editCurrency] = currencyTotals[this.state.editCurrency] + this.state.amount
+
+    currencyCount[this.state.currency] = currencyCount[this.state.currency] - 1
+    currencyTotals[this.state.currency] = currencyTotals[this.state.currency] - this.state.amount
+
+    // If previous currency was 0
+    if (this.state.currency === 0) {
+
+      categoryCount[this.state.category] = categoryCount[this.state.category] - 1
+      categoryTotals[this.state.category] = categoryTotal
+    
+    // If currency is now 0 and category has not been changed  
+    } else if (this.state.editCurrency === 0 && editCategory === null) {
+
+      categoryCount[this.state.category] = categoryCount[this.state.category] + 1
+      categoryTotals[this.state.category] = categoryTotals[this.state.category] + this.state.amount
+
+    // If currency is now 0 and category *has* been changed  
+    } else if (this.state.editCurrency === 0 && editCategory !== null) {
+
+      categoryCount[this.state.editCategory] = categoryCount[this.state.editCategory] + 1
+      categoryTotals[this.state.editCategory] = categoryTotals[this.state.editCategory] + this.state.amount
+
+    }
+
+
+    this.setState({editCurrency: null})
+  }
+
+
+  if (this.state.editAmount) {
+    receiptsAll[this.state.receiptIndex].amount = this.state.editAmount
   
-  receiptsAll[this.state.receiptIndex].date = this.state.editDate
+    this.setState({editAmount: null})
+  }
+
+  if (this.state.editDate) {
+    receiptsAll[this.state.receiptIndex].date = this.state.editDate
+  }
   
- 
+  if (this.state.editCategory) {
+    receiptsAll[this.state.receiptIndex].category = this.state.editCategory
+
+    if (this.state.currency === 0 && editCurrency === null) {
+
+      categoryCount[this.state.category] = categoryCount[this.state.category] - 1
+      categoryTotals[this.state.category] = categoryTotals[this.state.category] - this.state.amount
+
+      categoryCount[this.state.editCategory] = categoryCount[this.state.editCategory] + 1
+      categoryTotals[this.state.editCategory] = categoryTotals[this.state.editCategory] + this.state.amount
+
+
+    }
+
+    this.setState({editCategory: null})
+
+  }
+  
+  
+   console.log(receiptsAll)
+   this.setState({showReceiptDialogs: false})
 
 
 }
@@ -889,7 +972,6 @@ monthlyTable () {
   render() {
     
     console.log("render")
-    console.log(this.state.tempCategory)
 
     if (this.state.addReceipt) {
       
