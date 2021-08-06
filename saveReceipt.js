@@ -1,4 +1,5 @@
 import fire from './fire'
+import firebase from 'firebase'
 import {currencies, categories} from './constants'
 import {firestoreRefs} from './fireStoreRefs'
 import uuid from "uuid";
@@ -70,6 +71,17 @@ export async function saveReceipt (currency, amount, date, category, images) {
 
         receiptDetails.push(receiptCurrentDetails)
 
+        var firstReceiptDate = data.firstReceiptDate
+        var latestReceiptDate = data.latestReceiptDate
+
+        if (firebase.firestore.Timestamp.fromDate(date).seconds < firstReceiptDate.seconds) {
+            firstReceiptDate = date
+        }
+
+        if (firebase.firestore.Timestamp.fromDate(date).seconds > latestReceiptDate.seconds) {
+            latestReceiptDate = date
+        }
+
         firestoreRefs(UserID).userLogReceipts.update({
             receipts,
             categoryCount,
@@ -77,7 +89,8 @@ export async function saveReceipt (currency, amount, date, category, images) {
             currencyCount,
             currencyTotals,
 
-            latestReceiptDate: date,
+            firstReceiptDate,
+            latestReceiptDate,
 
             latestReceiptSubmitDate: new Date,
 
@@ -151,6 +164,36 @@ export async function saveReceipt (currency, amount, date, category, images) {
 
 }
 
+export async function updateReceipts (categoryCount, categoryTotals, currencyCount, currencyTotals, firstReceiptDate, latestReceiptDate, receiptDetails) {
+    
+    var UserID = fire.auth().currentUser.uid
+
+    
+
+    var result = await firestoreRefs(UserID).userLogReceipts.update({
+        categoryCount,
+        categoryTotals,
+        currencyCount,
+        currencyTotals,
+
+        firstReceiptDate,
+        latestReceiptDate,
+
+        receiptDetails
+
+    }).then(() => {
+
+        return true
+    })
+    .catch((error) => {
+        console.log(error)
+
+        return false
+    });
+
+    return result
+    
+}
 
 // cycle through the array of images and upload them
 export async function uploadImages(images, receiptNumber, UserID) {

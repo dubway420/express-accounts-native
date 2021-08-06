@@ -17,6 +17,7 @@ import { Dialog } from 'react-native-simple-dialogs';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import firebase from 'firebase'
+import { updateReceipts } from './saveReceipt'
 
 import ImageViewing from "./ImageViewing";
 import ImageList from "./components/ImageList";
@@ -836,36 +837,42 @@ monthlyTable () {
   componentDidMount(){
 
     console.log("componentDidMount: receipts view")
-    var UserID = fire.auth().currentUser.uid
     
-    firestoreRefs(UserID).userLogReceipts.get().then((doc) => {
-      if (doc.exists) {
-          
-          var data = doc.data()
-
-
-          this.setState({receipts: data.receipts,
-
-                          categoryCount: data.categoryCount,
-                          categoryTotals: data.categoryTotals,
-
-                          currencyCount: data.currencyCount,
-                          currencyTotals: data.currencyTotals,
-
-                          firstReceiptDate: data.firstReceiptDate,
-                          firstReceiptSubmitDate: data.firstReceiptSubmitDate,
-
-                          latestReceiptDate: data.latestReceiptDate,
-                          latestReceiptSubmitDate: data.latestReceiptSubmitDate,
-                          receiptDetails: data.receiptDetails
-          })
-
-      }
-    }) 
-
+    this.loadData()
     
 
   }
+
+ loadData() {
+   
+  var UserID = fire.auth().currentUser.uid
+    
+  firestoreRefs(UserID).userLogReceipts.get().then((doc) => {
+    if (doc.exists) {
+        
+        var data = doc.data()
+
+
+        this.setState({receipts: data.receipts,
+
+                        categoryCount: data.categoryCount,
+                        categoryTotals: data.categoryTotals,
+
+                        currencyCount: data.currencyCount,
+                        currencyTotals: data.currencyTotals,
+
+                        firstReceiptDate: data.firstReceiptDate,
+                        firstReceiptSubmitDate: data.firstReceiptSubmitDate,
+
+                        latestReceiptDate: data.latestReceiptDate,
+                        latestReceiptSubmitDate: data.latestReceiptSubmitDate,
+                        receiptDetails: data.receiptDetails
+        })
+
+    }
+  }) 
+
+}
 
  closeModal = () => {
     this.setState({showReceiptsList: false})
@@ -916,7 +923,7 @@ monthlyTable () {
   
  }
 
- updateReceipt = () => {
+ updateReceipt = async () => {
 
   var receiptsAll = this.state.receiptsSorted
 
@@ -947,7 +954,6 @@ monthlyTable () {
 
   }
 
-  console.log("updateReceipt: ", typeof(amountNew))
 
   if (this.state.editCurrency) {
     receiptsAll[this.state.receiptIndex].currency = this.state.editCurrency
@@ -986,8 +992,20 @@ monthlyTable () {
 
 
   if (this.state.editDate) {
-    receiptsAll[this.state.receiptIndex].date = firebase.firestore.Timestamp.fromDate(this.state.editDate)
+
+    var firebaseDate = firebase.firestore.Timestamp.fromDate(this.state.editDate)
+
+    receiptsAll[this.state.receiptIndex].date = firebaseDate
     this.setState({editDate: null})
+
+    if (firebaseDate.seconds > this.state.latestReceiptDate.seconds) {
+      this.setState({latestReceiptDate: firebaseDate})
+    }
+    if (firebaseDate.seconds < this.state.firstReceiptDate.seconds) {
+      this.setState({firstReceiptDate: firebaseDate})
+    }
+
+
   }
   
   if (this.state.editCategory) {
@@ -1012,9 +1030,21 @@ monthlyTable () {
   
   //  console.log(receiptsAll)
    this.setState({showReceiptDialogs: false,
-                  receiptsSorted: receiptsAll})
+                  receiptsSorted: receiptsAll,
+                  showUpdateButton: false,
+                  editSaved: false})
 
+
+   const changesSaved = await updateReceipts(categoryCount, categoryTotals, currencyCount, currencyTotals, this.state.firstReceiptDate, this.state.latestReceiptDate, receiptsAll)
+   
    this.receiptList()
+   if (changesSaved) {
+    Alert.alert('Changes Saved', 'Your changes have been saved.') 
+    }
+   else {
+    Alert.alert('Error', 'We encountered an error whilst trying to save your changes. Please try again.')
+    // this.loadData() 
+   }
 
 }
 
