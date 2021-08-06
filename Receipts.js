@@ -20,6 +20,7 @@ import CheckBox from '@react-native-community/checkbox';
 import {saveReceipt} from './saveReceipt'
 import ReceiptsView from './receiptsView'
 import { ConfirmDialog, ProgressDialog } from 'react-native-simple-dialogs';
+import {amountValid} from './utils'
 
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
@@ -116,7 +117,7 @@ export default class Receipts extends Component{
 
     this.setState({
       amount: value,
-      amountValid: !isNaN(value)
+      amountValid: amountValid(value)
     })
 
   }

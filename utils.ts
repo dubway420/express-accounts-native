@@ -207,3 +207,14 @@ export function financialYear() {
 
   
 }
+
+export function amountValid (value) {
+
+  var valid = false
+  if (value > 0 && !isNaN(value) && value !== '') {
+    valid = true
+  }
+
+  return valid
+
+}

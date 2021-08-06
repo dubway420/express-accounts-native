@@ -69,7 +69,9 @@ class Login extends Component{
  
   }
 
-
+  componentDidMount(){
+    console.log("componentDidMount: login")
+  }
 
   
   render() {

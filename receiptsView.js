@@ -8,7 +8,7 @@ import Receipts from './Receipts'
 import { categories, months, currencies } from './constants'
 import { screenWidth } from './extras'
 import { makeCategoryChart, monthListFull, makeMonthlyChart } from './graphStuff'
-import {financialYear} from './utils'
+import {financialYear, amountValid} from './utils'
 import {firestoreRefs} from './fireStoreRefs'
 import { Table, TableWrapper, Row } from 'react-native-table-component';
 import Modal from 'react-native-modal';
@@ -16,6 +16,7 @@ import {Picker} from '@react-native-picker/picker'
 import { Dialog } from 'react-native-simple-dialogs';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DateTimePicker from '@react-native-community/datetimepicker';
+import firebase from 'firebase'
 
 import ImageViewing from "./ImageViewing";
 import ImageList from "./components/ImageList";
@@ -35,7 +36,7 @@ import get from "lodash/get";
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
 LogBox.ignoreLogs([`Setting a timer for a long period`]);
 
-const tableHead = ['Amount', 'date', 'Category', 'Logged at']
+const tableHead = ['Amount', 'date', 'Category', 'Logged']
 const widthArr = [screenWidth*0.2, screenWidth*0.2, screenWidth*0.35, screenWidth*0.2]
 
 const widthArr2 = [screenWidth*0.45, screenWidth*0.4]
@@ -96,7 +97,7 @@ export class ReceiptsView extends Component{
 
         tempCurrency: null,
         tempAmount: null,
-        amountValid: false,
+        amountValid: true,
         tempCategory: null,
 
         editCurrency: null,
@@ -238,11 +239,16 @@ export class ReceiptsView extends Component{
 
   amountHandler(value) {
 
+
+
     this.setState({
       tempAmount: value,
-      amountValid: !isNaN(value),
+      amountValid: amountValid(value),
       showUpdateButton: true
     })
+
+    // console.log(value)
+    // console.log(this.state.amountValid)
 
   }
 
@@ -297,20 +303,33 @@ export class ReceiptsView extends Component{
   updateButton = () => {
   
     if (this.state.showEditDialogType === 1) {
-    this.setState({
-      showEditDialog: false,
-      showUpdateButton: false,
-      editCurrency: this.state.tempCurrency,
-      editAmount: this.state.tempAmount,
-      editSaved: true
 
-    })}
+    if (this.state.amountValid) {  
+
+      this.setState({
+        showEditDialog: false,
+        showUpdateButton: false,
+        editCurrency: this.state.tempCurrency,
+        editAmount: this.state.tempAmount,
+        tempCurrency: null,
+        tempAmount: null,
+        editSaved: true
+
+      })
+  
+    } else {
+
+      Alert.alert("Ensure that the amount field is filled in with a valid amount.")
+
+    }
+  }
 
     else {
       this.setState({
         showEditDialog: false,
         showUpdateButton: false,
         editCategory: this.state.tempCategory,
+        tempCategory: null,
         editSaved: true
       })
     }
@@ -547,6 +566,7 @@ export class ReceiptsView extends Component{
       category_style = {width: "50%"}
     } 
 
+    var x = 0
 
     return (
       <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
@@ -561,16 +581,26 @@ export class ReceiptsView extends Component{
             <ScrollView keyboardShouldPersistTaps='handled' style={styles.dataWrapper}>
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
                 {
-                  this.state.receiptsList.map((rowData, index) => (
-                    <Row
-                      key={index}
-                      data={rowData}
+                  
+                  this.state.receiptsList.map(
+                    
+
+                    
+                    function(e, i) {
+                      
+                      if (e) {
+                        x += 1}
+
+                      // console.log(x)  
+                      return <Row
+                      key={i}
+                      data={e}
                       widthArr={widthArr}
-                      style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
+                      style={[styles.row, x%2 && {backgroundColor: '#F7F6E7'}]}
                       textStyle={styles.text}
-                      onPress={() => {this.selectRow(index)}}
-                    />
-                  ))
+                      onPress={() => {this.selectRow(i)}}
+                    />}, this
+                  )
                 }
               </Table>
 
@@ -741,6 +771,7 @@ categoryTable () {
       <ScrollView keyboardShouldPersistTaps='handled' style={styles.dataWrapper}>
         <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
           {
+
             data.map((rowData, index) => (
               <Row
                 key={index}
@@ -749,6 +780,9 @@ categoryTable () {
                 style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
                 textStyle={styles.text}/>
             ))
+
+
+
           }
         </Table>
 
@@ -801,9 +835,7 @@ monthlyTable () {
 
   componentDidMount(){
 
-    
-        
-    console.log("componentDidMount")
+    console.log("componentDidMount: receipts view")
     var UserID = fire.auth().currentUser.uid
     
     firestoreRefs(UserID).userLogReceipts.get().then((doc) => {
@@ -898,11 +930,30 @@ monthlyTable () {
   // Changes if 1) category is changing, or 2) currency is changing from/to 0
   var categoryTotals = this.state.categoryTotals
 
+  var amountNew = this.state.amount
+  if (this.state.editAmount) {
+    amountNew = Number(this.state.editAmount)
+    receiptsAll[this.state.receiptIndex].amount = amountNew
+    
+    this.setState({editAmount: null})
+
+
+    if (this.state.editCurrency === null && this.state.editCategory === null) {
+      
+        categoryTotals[this.state.category] = categoryTotals[this.state.category] - this.state.amount
+        categoryTotals[this.state.category] = categoryTotals[this.state.category] + amountNew
+
+    }
+
+  }
+
+  console.log("updateReceipt: ", typeof(amountNew))
+
   if (this.state.editCurrency) {
     receiptsAll[this.state.receiptIndex].currency = this.state.editCurrency
 
     currencyCount[this.state.editCurrency] = currencyCount[this.state.editCurrency] + 1
-    currencyTotals[this.state.editCurrency] = currencyTotals[this.state.editCurrency] + this.state.amount
+    currencyTotals[this.state.editCurrency] = currencyTotals[this.state.editCurrency] + amountNew
 
     currencyCount[this.state.currency] = currencyCount[this.state.currency] - 1
     currencyTotals[this.state.currency] = currencyTotals[this.state.currency] - this.state.amount
@@ -911,19 +962,19 @@ monthlyTable () {
     if (this.state.currency === 0) {
 
       categoryCount[this.state.category] = categoryCount[this.state.category] - 1
-      categoryTotals[this.state.category] = categoryTotal
+      categoryTotals[this.state.category] = categoryTotals[this.state.category] - this.state.amount
     
     // If currency is now 0 and category has not been changed  
     } else if (this.state.editCurrency === 0 && editCategory === null) {
 
       categoryCount[this.state.category] = categoryCount[this.state.category] + 1
-      categoryTotals[this.state.category] = categoryTotals[this.state.category] + this.state.amount
+      categoryTotals[this.state.category] = categoryTotals[this.state.category] + amountNew
 
     // If currency is now 0 and category *has* been changed  
     } else if (this.state.editCurrency === 0 && editCategory !== null) {
 
       categoryCount[this.state.editCategory] = categoryCount[this.state.editCategory] + 1
-      categoryTotals[this.state.editCategory] = categoryTotals[this.state.editCategory] + this.state.amount
+      categoryTotals[this.state.editCategory] = categoryTotals[this.state.editCategory] + amountNew
 
     }
 
@@ -932,26 +983,23 @@ monthlyTable () {
   }
 
 
-  if (this.state.editAmount) {
-    receiptsAll[this.state.receiptIndex].amount = this.state.editAmount
-  
-    this.setState({editAmount: null})
-  }
+
 
   if (this.state.editDate) {
-    receiptsAll[this.state.receiptIndex].date = this.state.editDate
+    receiptsAll[this.state.receiptIndex].date = firebase.firestore.Timestamp.fromDate(this.state.editDate)
+    this.setState({editDate: null})
   }
   
   if (this.state.editCategory) {
     receiptsAll[this.state.receiptIndex].category = this.state.editCategory
 
-    if (this.state.currency === 0 && editCurrency === null) {
+    if (this.state.currency === 0 && this.state.editCurrency === null) {
 
       categoryCount[this.state.category] = categoryCount[this.state.category] - 1
       categoryTotals[this.state.category] = categoryTotals[this.state.category] - this.state.amount
 
       categoryCount[this.state.editCategory] = categoryCount[this.state.editCategory] + 1
-      categoryTotals[this.state.editCategory] = categoryTotals[this.state.editCategory] + this.state.amount
+      categoryTotals[this.state.editCategory] = categoryTotals[this.state.editCategory] + amountNew
 
 
     }
@@ -960,10 +1008,13 @@ monthlyTable () {
 
   }
   
+  receiptsAll[this.state.receiptIndex].updated = firebase.firestore.Timestamp.fromDate(new Date())
   
-   console.log(receiptsAll)
-   this.setState({showReceiptDialogs: false})
+  //  console.log(receiptsAll)
+   this.setState({showReceiptDialogs: false,
+                  receiptsSorted: receiptsAll})
 
+   this.receiptList()
 
 }
 
