@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
       backgroundColor: '#00000000',
       marginHorizontal: 15,
       alignSelf: "center",
-      width: '95%',
+      width: '100%',
       height: '90%'
     },
     box: {
@@ -52,14 +52,16 @@ export const styles = StyleSheet.create({
         justifyContent: "center"
       },
     logo: {
-        height: 100,
-        width: '90%',
-        alignSelf: "center",
+        height: 400,
+        // width: '90%',
+        alignSelf: 'center',
         marginTop: 5,
-        flex: 1,
+        flex: 20,
     // width: null,
     // height: null,
-    resizeMode: 'contain'
+    resizeMode: 'contain',
+    paddingVertical: 20,
+    // marginVertical: 1,
       },  
     textContainer: {
        marginVertical: 10
@@ -151,6 +153,9 @@ export const styles = StyleSheet.create({
    dateInput: {
     // backgroundColor: '#800020',
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    
     borderWidth: 1,
     paddingVertical: 10,
     paddingLeft: 5,
@@ -392,5 +397,12 @@ moreInfoText:{
   color: 'white',
   textAlign: 'center'
 },
+tableView: {
+  height: "100%", 
+  width: "100%", 
+  backgroundColor: 'white', 
+  marginTop: StatusBar.currentHeight, 
+  // alignItems: 'center', 
+  paddingVertical: 20}
 
   });

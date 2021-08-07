@@ -6,6 +6,7 @@ import ImageExtract from './ImageExtract'
 import ReceiptsView from './receiptsView'
 import Receipts from './Receipts'
 import {displayValues} from './testSpace'
+// import {Text} from 'react-native'
 
 
 class App extends React.Component {
@@ -69,6 +70,7 @@ class App extends React.Component {
     else {
         return (
         <ReceiptsView/>
+
         // <Receipts/>
         // displayValues
         )

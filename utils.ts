@@ -218,3 +218,23 @@ export function amountValid (value) {
   return valid
 
 }
+
+export function getStartOfFinancialYear() {
+
+  var currentDate = new Date()
+
+  var year = currentDate.getFullYear()
+
+  if (isAfterFifthApril(currentDate)) {
+
+    return new Date(year, 3, 5)
+
+  } else {
+
+    let yearMinusOne = year - 1
+
+    return new Date(yearMinusOne, 3, 5)
+
+  }
+
+}

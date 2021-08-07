@@ -195,6 +195,8 @@ export async function updateReceipts (categoryCount, categoryTotals, currencyCou
     
 }
 
+
+
 // cycle through the array of images and upload them
 export async function uploadImages(images, receiptNumber, UserID) {
     var promises = []

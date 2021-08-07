@@ -8,12 +8,12 @@ import Receipts from './Receipts'
 import { categories, months, currencies } from './constants'
 import { screenWidth } from './extras'
 import { makeCategoryChart, monthListFull, makeMonthlyChart } from './graphStuff'
-import {financialYear, amountValid} from './utils'
+import {financialYear, amountValid, getStartOfFinancialYear} from './utils'
 import {firestoreRefs} from './fireStoreRefs'
 import { Table, TableWrapper, Row } from 'react-native-table-component';
 import Modal from 'react-native-modal';
 import {Picker} from '@react-native-picker/picker'
-import { Dialog } from 'react-native-simple-dialogs';
+import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import firebase from 'firebase'
@@ -108,7 +108,9 @@ export class ReceiptsView extends Component{
 
         showUpdateButton: false,
 
-        editSaved: false
+        editSaved: false,
+
+        deleteButtonPressed: false
 
     };
 
@@ -440,6 +442,8 @@ export class ReceiptsView extends Component{
           // mode={mode}
           is24Hour={true}
           display="default"
+          minimumDate={getStartOfFinancialYear()}
+          maximumDate={new Date()}
           visible={this.state.showEditDialog}
           onChange={this.dateChange}
         />
@@ -491,8 +495,6 @@ export class ReceiptsView extends Component{
         </Dialog>
       )
     }
-
-
 
   }
 
@@ -570,8 +572,8 @@ export class ReceiptsView extends Component{
     var x = 0
 
     return (
-      <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
-      <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+      // <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
+      <SafeAreaView style={styles.tableView}>
         
       <ScrollView keyboardShouldPersistTaps='handled' horizontal={true}>
           <View>
@@ -579,20 +581,17 @@ export class ReceiptsView extends Component{
             <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
               <Row data={tableHead} widthArr={widthArr} style={styles.header} textStyle={styles.text}/>
             </Table>
-            <ScrollView keyboardShouldPersistTaps='handled' style={styles.dataWrapper}>
-              <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+            <ScrollView keyboardShouldPersistTaps='handled' style={{height: "50%"}}>
+              <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9', width: "100%"}}>
                 {
                   
                   this.state.receiptsList.map(
-                    
-
                     
                     function(e, i) {
                       
                       if (e) {
                         x += 1}
 
-                      // console.log(x)  
                       return <Row
                       key={i}
                       data={e}
@@ -600,7 +599,8 @@ export class ReceiptsView extends Component{
                       style={[styles.row, x%2 && {backgroundColor: '#F7F6E7'}]}
                       textStyle={styles.text}
                       onPress={() => {this.selectRow(i)}}
-                    />}, this
+                    />
+                  }, this
                   )
                 }
               </Table>
@@ -694,15 +694,32 @@ export class ReceiptsView extends Component{
 
                       <TouchableOpacity
                         style = {styles.trashButton}
-                        onPress = {() => this.setState({showReceiptDialogs: false})}
+                        onPress = {() => this.setState({deleteButtonPressed: true})}
                         >
                           
-                        <Icon name={"trash"} size={20} />
+                        <Icon 
+                        //  onPress = {() => this.setState({deleteButtonPressed: true})}
+                         name={"trash"} size={20} />
                       </TouchableOpacity>
 
                     </View>
                   </View>
               </Dialog>
+
+              <ConfirmDialog
+                title="Confirm Dialog"
+                message="Are you sure about that?"
+                visible={this.state.deleteButtonPressed}
+                onTouchOutside={() => this.setState({deleteButtonPressed: false})}
+                positiveButton={{
+                    title: "YES",
+                    onPress: this.deleteReceipt
+                }}
+                negativeButton={{
+                    title: "NO",
+                    onPress: () => this.setState({deleteButtonPressed: false})
+                }}
+              />
 
               
 
@@ -715,22 +732,24 @@ export class ReceiptsView extends Component{
                       // onLongPress={onLongPress}
 
               />
-
+<TouchableOpacity
+              style = {styles.photoButton}
+              onPress = {this.closeModal}
+              >
+                <Text style = {styles.submitButtonText}> Close </Text>
+            </TouchableOpacity>
             </ScrollView>
+
+            
+
           </View>
-        </ScrollView>
 
         {this.editDialog()}
 
-        <TouchableOpacity
-          style = {styles.photoButton}
-          onPress = {this.closeModal}
-          >
-            <Text style = {styles.submitButtonText}> Close </Text>
-        </TouchableOpacity>
-
+        
+        </ScrollView>
       </SafeAreaView>
-    </Modal>
+
     )
   }
 
@@ -989,8 +1008,6 @@ monthlyTable () {
   }
 
 
-
-
   if (this.state.editDate) {
 
     var firebaseDate = firebase.firestore.Timestamp.fromDate(this.state.editDate)
@@ -1049,6 +1066,48 @@ monthlyTable () {
 }
 
 
+deleteReceipt = async () => {
+
+  var receipts = this.state.receipts
+  receipts = receipts -1
+
+  var currency = this.state.currency
+
+  if (currency === 0) {
+
+    var category = this.state.category
+    var categoryTotals = this.state.categoryTotals
+    var categoryCount = this.state.categoryCount
+
+    categoryCount[category] = categoryCount[category] - 1
+    categoryTotals[category] = categoryTotals[category] - this.state.amount
+
+    var receiptsAll = this.state.receiptsSorted
+
+    // remove the receipt from the array
+    receiptsAll.splice(this.state.receiptIndex, 1)
+
+    this.setState({receipts,
+                   receiptsSorted: receiptsAll,
+                   categoryCount: categoryCount,
+                   categoryTotals: categoryTotals,
+                   deleteButtonPressed: false,
+                   showReceiptDialogs: false,
+                   showUpdateButton: false,
+                   editSaved: false})
+
+  }
+
+  var currencyCount = this.state.currencyCount
+  var currencyTotals = this.state.currencyTotals
+
+  currencyCount[currency] = currencyCount[currency] - 1
+  currencyTotals[currency] = currencyTotals[currency] - this.state.amount
+  
+
+  this.receiptList()
+}
+
 
   render() {
     
@@ -1060,7 +1119,14 @@ monthlyTable () {
         <Receipts/>
       )
 
-    } else {
+    } else if (this.state.showReceiptsList) {
+
+      return (this.receiptListModal())
+
+
+    }
+    
+    else {
 
         return(
             
@@ -1070,13 +1136,17 @@ monthlyTable () {
             source={background}
             style={styles.large} />
 
+            <View backgroundColor={"white"} style={{height: 75,justifyContent: "flex-start", padding: 5, borderColor: "black", borderWidth: 1,}} >
+             <Image source={logo} style={styles.logo} />
+            </View>
+
             <ScrollView style={styles.scrollView}>
 
             {/* <ImageBackground source={background} style={styles.image}> */}
 
             <View style={styles.box}>
 
-            <Image style={styles.logo} source={logo} />
+            
 
                 <View style = {styles.textContainer}>
                   <Text style = {styles.text} >Welcome, {fire.auth().currentUser.displayName}</Text>

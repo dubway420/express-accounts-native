@@ -20,7 +20,7 @@ import CheckBox from '@react-native-community/checkbox';
 import {saveReceipt} from './saveReceipt'
 import ReceiptsView from './receiptsView'
 import { ConfirmDialog, ProgressDialog } from 'react-native-simple-dialogs';
-import {amountValid} from './utils'
+import {amountValid, getStartOfFinancialYear} from './utils'
 
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
@@ -534,7 +534,7 @@ export default class Receipts extends Component{
                           style={styles.dateInput}
                           onPress = {this.showDatePicker}>
                           <Text style={{fontSize:15}} > {this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()} </Text>
-                          
+                          <Icon style={{paddingRight: 15}} onPress={this.showDatePicker} name={'calendar'} size={15} color={'grey'}/>
                     </TouchableOpacity>
 
 
@@ -544,6 +544,8 @@ export default class Receipts extends Component{
                     // mode={mode}
                     is24Hour={true}
                     display="default"
+                    minimumDate={getStartOfFinancialYear()}
+                    maximumDate={new Date()}
                     onChange={this.dateChange}
                   />}
 
