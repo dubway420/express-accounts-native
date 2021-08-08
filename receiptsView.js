@@ -17,7 +17,7 @@ import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import firebase from 'firebase'
-import { updateReceipts } from './saveReceipt'
+import { updateReceipts, deleteReceipts } from './saveReceipt'
 
 import ImageViewing from "./ImageViewing";
 import ImageList from "./components/ImageList";
@@ -148,11 +148,11 @@ export class ReceiptsView extends Component{
       numberReceipts = <Text style={styles.label}>You have not saved any receipts yet</Text>
     } else if (this.state.receipts === 1){ 
       numberReceipts = <Text style={styles.label}>You have saved one receipt</Text>
-      firstReceiptMessage = <Text style={styles.message}>This receipt was dated {this.dateFormat(this.state.firstReceiptDate)} and submitted on {this.dateFormat(this.state.firstReceiptSubmitDate)}</Text>
+      // firstReceiptMessage = <Text style={styles.message}>This receipt was dated {this.dateFormat(this.state.firstReceiptDate)} and submitted on {this.dateFormat(this.state.firstReceiptSubmitDate)}</Text>
     } else {
       numberReceipts =  <Text style={styles.label}>You have saved a total of {this.state.receipts} receipts</Text> 
-      firstReceiptMessage = <Text style={styles.message}>First receipt was dated {this.dateFormat(this.state.firstReceiptDate)} and submitted on {this.dateFormat(this.state.firstReceiptSubmitDate)}</Text>
-      latestReceiptMessage = <Text style={styles.message}>Latest receipt was dated {this.dateFormat(this.state.latestReceiptDate)} and submitted on {this.dateFormat(this.state.latestReceiptSubmitDate)}</Text>
+      // firstReceiptMessage = <Text style={styles.message}>First receipt was dated {this.dateFormat(this.state.firstReceiptDate)} and submitted on {this.dateFormat(this.state.firstReceiptSubmitDate)}</Text>
+      // latestReceiptMessage = <Text style={styles.message}>Latest receipt was dated {this.dateFormat(this.state.latestReceiptDate)} and submitted on {this.dateFormat(this.state.latestReceiptSubmitDate)}</Text>
       
       graphs = <View style = {{marginTop: 10}}>      
                     <TouchableOpacity
@@ -707,8 +707,8 @@ export class ReceiptsView extends Component{
               </Dialog>
 
               <ConfirmDialog
-                title="Confirm Dialog"
-                message="Are you sure about that?"
+                title="Receipt Deletion"
+                message="Are you sure that you want to delete this receipt?"
                 visible={this.state.deleteButtonPressed}
                 onTouchOutside={() => this.setState({deleteButtonPressed: false})}
                 positiveButton={{
@@ -934,6 +934,7 @@ monthlyTable () {
                  date: this.dateFormat(receipt.date),
                  convertedDate: receipt.date.toDate(),
                  logged: this.dateFormat(receipt.logged),
+                 loggedConverted: receipt.logged.toDate(),
                  updated: updated,
 
                  imagesURLs,
@@ -1015,12 +1016,13 @@ monthlyTable () {
     receiptsAll[this.state.receiptIndex].date = firebaseDate
     this.setState({editDate: null})
 
-    if (firebaseDate.seconds > this.state.latestReceiptDate.seconds) {
-      this.setState({latestReceiptDate: firebaseDate})
-    }
-    if (firebaseDate.seconds < this.state.firstReceiptDate.seconds) {
-      this.setState({firstReceiptDate: firebaseDate})
-    }
+    // TODO fix this 
+    // if (firebaseDate.seconds > this.state.latestReceiptDate.seconds) {
+    //   this.setState({latestReceiptDate: firebaseDate})
+    // }
+    // if (firebaseDate.seconds < this.state.firstReceiptDate.seconds) {
+    //   this.setState({firstReceiptDate: firebaseDate})
+    // }
 
 
   }
@@ -1071,30 +1073,22 @@ deleteReceipt = async () => {
   var receipts = this.state.receipts
   receipts = receipts -1
 
+  var receiptsAll = this.state.receiptsSorted
+
+  // remove the receipt from the array
+  receiptsAll.splice(this.state.receiptIndex, 1)
+
   var currency = this.state.currency
+
+  var category = this.state.category
+  var categoryTotals = this.state.categoryTotals
+  var categoryCount = this.state.categoryCount
 
   if (currency === 0) {
 
-    var category = this.state.category
-    var categoryTotals = this.state.categoryTotals
-    var categoryCount = this.state.categoryCount
 
     categoryCount[category] = categoryCount[category] - 1
     categoryTotals[category] = categoryTotals[category] - this.state.amount
-
-    var receiptsAll = this.state.receiptsSorted
-
-    // remove the receipt from the array
-    receiptsAll.splice(this.state.receiptIndex, 1)
-
-    this.setState({receipts,
-                   receiptsSorted: receiptsAll,
-                   categoryCount: categoryCount,
-                   categoryTotals: categoryTotals,
-                   deleteButtonPressed: false,
-                   showReceiptDialogs: false,
-                   showUpdateButton: false,
-                   editSaved: false})
 
   }
 
@@ -1103,9 +1097,67 @@ deleteReceipt = async () => {
 
   currencyCount[currency] = currencyCount[currency] - 1
   currencyTotals[currency] = currencyTotals[currency] - this.state.amount
-  
 
+  // check if the receipt being deleted was any one of the first/latest date/logged
+  // var deletedMatches = false
+
+
+  // if (firebase.firestore.Timestamp.fromDate(this.state.convertedDate).seconds == this.state.firstReceiptDate.seconds ) {
+  //   deletedMatches = true    
+  // }
+
+  // if (firebase.firestore.Timestamp.fromDate(this.state.convertedDate).seconds == this.state.latestReceiptDate.seconds ) {
+  //   deletedMatches = true
+  // }
+
+
+  // if (firebase.firestore.Timestamp.fromDate(this.state.loggedConverted).seconds == this.state.firstReceiptSubmitDate.seconds ) {
+  //   deletedMatches = true
+  // }
+
+  // if (firebase.firestore.Timestamp.fromDate(this.state.loggedConverted).seconds == this.state.latestReceiptSubmitDate.seconds ) {
+  //   deletedMatches = true
+  // }
+
+
+  var firstReceiptDate = this.state.firstReceiptDate
+  var latestReceiptDate = this.state.latestReceiptDate
+
+  var firstReceiptSubmitDate = this.state.firstReceiptSubmitDate
+  var latestReceiptSubmitDate = this.state.latestReceiptSubmitDate
+
+  // console.log(deletedMatches)
+
+
+  // var receiptDateSeconds, receiptLoggedSeconds
+  // // for each item in receiptsAll, get the date
+  // for (var i = 0; i < receiptsAll.length; i++) {
+  //   var receiptDateSeconds = firebase.firestore.Timestamp.fromDate(receiptsAll[i].date).seconds
+  //   var receiptLoggedSeconds = firebase.firestore.Timestamp.fromDate(receiptsAll[i].logged).seconds
+  // }
+
+
+
+  this.setState({receipts,
+                  receiptsSorted: receiptsAll,
+                  categoryCount: categoryCount,
+                  categoryTotals: categoryTotals,
+                  currencyCount: currencyCount,
+                  currencyTotals: currencyTotals,
+                  deleteButtonPressed: false,
+                  showReceiptDialogs: false,
+                  showUpdateButton: false,
+                  editSaved: false})
+  
+  const changesSaved = await deleteReceipts(receipts, categoryCount, categoryTotals, currencyCount, currencyTotals, firstReceiptDate, latestReceiptDate, firstReceiptSubmitDate, latestReceiptSubmitDate, receiptsAll)
   this.receiptList()
+  if (changesSaved) {
+    Alert.alert('Changes Saved', 'Your changes have been saved.') 
+    }
+   else {
+    Alert.alert('Error', 'We encountered an error whilst trying to save your changes. Please try again.')
+    // this.loadData() 
+   }
 }
 
 
@@ -1136,13 +1188,36 @@ deleteReceipt = async () => {
             source={background}
             style={styles.large} />
 
-            <View backgroundColor={"white"} style={{height: 75,justifyContent: "flex-start", padding: 5, borderColor: "black", borderWidth: 1,}} >
-             <Image source={logo} style={styles.logo} />
-            </View>
+
 
             <ScrollView style={styles.scrollView}>
 
-            {/* <ImageBackground source={background} style={styles.image}> */}
+            <View backgroundColor={"white"} style={styles.topBar} >
+
+              <TouchableOpacity
+                style = {{paddingLeft: 5, paddingTop: 5}}
+                onPress = {() => this.setState({deleteButtonPressed: true})}
+                >
+                  
+                <Icon 
+                //  onPress = {() => this.setState({deleteButtonPressed: true})}
+                  name={"bars"} size={35} style={{color: "grey"}} />
+              </TouchableOpacity>
+
+              <Image source={logo} style={styles.logoTop} />
+
+              <TouchableOpacity  
+                        style = {{paddingRight: 5}}
+                        onPress = {() => this.setState({deleteButtonPressed: true})}
+                        >
+                          
+                        <Icon 
+                        //  onPress = {() => this.setState({deleteButtonPressed: true})}
+                         name={"users"} size={30} style={{color: "grey"}} />
+                      </TouchableOpacity>
+
+             
+            </View>
 
             <View style={styles.box}>
 

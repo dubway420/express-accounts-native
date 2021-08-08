@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
     outerContainer: {
       flex: 1,
       height: "90%",
-      marginTop: StatusBar.currentHeight,
+      marginTop: StatusBar.currentHeight*1.1,
     },
     outerContainer2: {
       width: "100%",
@@ -52,10 +52,10 @@ export const styles = StyleSheet.create({
         justifyContent: "center"
       },
     logo: {
-        height: 400,
-        // width: '90%',
+        height: 100,
+        width: '90%',
         alignSelf: 'center',
-        marginTop: 5,
+        marginTop: 15,
         flex: 20,
     // width: null,
     // height: null,
@@ -63,6 +63,26 @@ export const styles = StyleSheet.create({
     paddingVertical: 20,
     // marginVertical: 1,
       },  
+    logoTop: {
+      height: 40,
+      width: '90%',
+      // alignSelf: 'center',
+      marginVertical: 10,
+      flex: 1,
+  // width: null,
+  // height: null,
+  resizeMode: 'contain',
+  // paddingVertical: 20,
+  // marginVertical: 1,
+    },  
+    topBar: {
+      alignSelf: 'stretch',
+    height: 45,
+    flexDirection: 'row', // row
+    alignItems: 'center',
+    justifyContent: 'space-between', // center, space-around
+    paddingLeft: 10,
+    paddingRight: 10},
     textContainer: {
        marginVertical: 10
     },  
@@ -123,6 +143,7 @@ export const styles = StyleSheet.create({
   },
    label: {
      paddingLeft: 5,
+     marginBottom: 5,
      width: "100%",
      textDecorationLine: 'underline'
 

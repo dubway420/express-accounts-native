@@ -70,6 +70,7 @@ class App extends React.Component {
     else {
         return (
         <ReceiptsView/>
+        // <Login/>
 
         // <Receipts/>
         // displayValues

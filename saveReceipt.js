@@ -195,7 +195,35 @@ export async function updateReceipts (categoryCount, categoryTotals, currencyCou
     
 }
 
+export async function deleteReceipts (receipts, categoryCount, categoryTotals, currencyCount, currencyTotals, firstReceiptDate, latestReceiptDate, firstReceiptSubmitDate, latestReceiptSubmitDate, receiptDetails) {
 
+    var UserID = fire.auth().currentUser.uid
+
+    var result = await firestoreRefs(UserID).userLogReceipts.update({
+        
+        receipts, 
+        categoryCount,
+        categoryTotals,
+        currencyCount,
+        currencyTotals,
+
+        firstReceiptDate,
+        latestReceiptDate,
+
+        firstReceiptSubmitDate, 
+        latestReceiptSubmitDate,
+
+        receiptDetails
+
+    }).then(() => {
+        
+        return true
+    })
+    .catch((error) => {});
+
+    return result
+
+}
 
 // cycle through the array of images and upload them
 export async function uploadImages(images, receiptNumber, UserID) {
