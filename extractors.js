@@ -165,7 +165,7 @@ function categoryFinder(test_string){
 
   }
   
-  console.log(category_counts)
+  // console.log(category_counts)
 
   if (found) {
     var highestCategoryIndex = category_counts.indexOf(Math.max(...category_counts))

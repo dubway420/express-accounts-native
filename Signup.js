@@ -94,7 +94,7 @@ export class Signup extends Component{
 
   cancel(e){
 
-    DevSettings.reload()
+    this.props.navigation.navigate('Login')
 
   }
 
@@ -168,6 +168,8 @@ export class Signup extends Component{
         u.user.sendEmailVerification().then(function() {
 
         })
+
+        this.props.navigation.navigate('receiptsView')
 
 
       }).catch((err)=>{

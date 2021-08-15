@@ -65,7 +65,8 @@ class Login extends Component{
 
   register(e){
 
-    this.setState({signup: true})
+    // this.setState({signup: true})
+    this.props.navigation.navigate('Sign up')
  
   }
 
@@ -76,8 +77,7 @@ class Login extends Component{
   
   render() {
 
-    if (!this.state.signup) {
-      return(
+       return(
       
         <SafeAreaView style={styles.outerContainer}>
 
@@ -157,12 +157,7 @@ class Login extends Component{
       </SafeAreaView>
     
 
-    )} else {
-      return (
-        <Signup/>
-
-      )
-    }
+    )
 
   }
 

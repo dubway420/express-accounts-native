@@ -3,6 +3,12 @@ import {StyleSheet, StatusBar} from "react-native"
 
 export const styles = StyleSheet.create({
     
+    splashScreen: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: StatusBar.currentHeight*1.1,
+    },  
     outerContainer: {
       flex: 1,
       height: "90%",

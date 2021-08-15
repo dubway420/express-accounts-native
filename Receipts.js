@@ -21,7 +21,7 @@ import {saveReceipt} from './saveReceipt'
 import ReceiptsView from './receiptsView'
 import { ConfirmDialog, ProgressDialog } from 'react-native-simple-dialogs';
 import {amountValid, getStartOfFinancialYear} from './utils'
-
+import {topBar} from './topBar'
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
 LogBox.ignoreLogs([`Setting a timer for a long period`]);
@@ -58,7 +58,8 @@ var baseState = {
       imageMethodMessage: false,
       uploadingMessageShow: false,
 
-      successMessage: "Receipt Successfully added to database"
+      successMessage: "Receipt Successfully added to database",
+      allData: null
   }
 
 export default class Receipts extends Component{
@@ -266,11 +267,12 @@ export default class Receipts extends Component{
         uploadingMessageShow: true
       })
 
-      const success = await saveReceipt(this.state.currency, this.state.amount, this.state.date, this.state.category, this.state.images)
+      const allData = await saveReceipt(this.state.currency, this.state.amount, this.state.date, this.state.category, this.state.images)
 
       this.setState({
         dialogVisible: true,
-        uploadingMessageShow: false
+        uploadingMessageShow: false,
+        allData: allData
       })
       
       
@@ -282,10 +284,8 @@ export default class Receipts extends Component{
   }
 
   cancel = () => {
-
-    this.setState({
-      returnToView: true
-    })
+    
+    this.props.navigation.navigate('receiptsView')
 
   }
 
@@ -346,323 +346,321 @@ export default class Receipts extends Component{
   //   },
   // };
 
-    if (this.state.returnToView) {
-      return(
-        <ReceiptsView/>
-      )
-    }
-    else {
 
-      let extractedInfo = this.state.extractedInfo
-      let money = extractedInfo.money
-      let date = extractedInfo.date
-      let category = extractedInfo.category
+    let extractedInfo = this.state.extractedInfo
+    let money = extractedInfo.money
+    let date = extractedInfo.date
+    let category = extractedInfo.category
 
-      let displayValues
-      let notDetected = "not detected"
+    let displayValues
+    let notDetected = "not detected"
 
-      var moneyOutput = false 
-      var dateOutput = false
-      var categoryOutput = false
+    var moneyOutput = false 
+    var dateOutput = false
+    var categoryOutput = false
 
-      if (this.state.valid) {
+    if (this.state.valid) {
 
-        let moneyText
-        if (money.value) {moneyText = currencies[money.currency].symbol + money.value
-                          moneyOutput = true}
-        else {moneyText = notDetected}
+      let moneyText
+      if (money.value) {moneyText = currencies[money.currency].symbol + money.value
+                        moneyOutput = true}
+      else {moneyText = notDetected}
 
-        let dateText
-        if (date) {dateText = date.day + " " + months[date.month] + " " + date.year
-                  dateOutput = true}
-        else {dateText = notDetected}
+      let dateText
+      if (date) {dateText = date.day + " " + months[date.month] + " " + date.year
+                dateOutput = true}
+      else {dateText = notDetected}
 
-        let categoryText
-        if (category >= 0) {categoryText = categories[category].name
-                            categoryOutput = true}
-        else {categoryText = notDetected}
+      let categoryText
+      if (category >= 0) {categoryText = categories[category].name
+                          categoryOutput = true}
+      else {categoryText = notDetected}
 
 
-        displayValues = <View style={{alignContent: 'center', width: "80%"}}> 
-                          <Text style={styles.outline}>We were able to extract the following information from this image: </Text> 
-                          
-                          <View style={styles.CheckBoxContainer}> 
-                              <Text style={styles.outline}> </Text> 
-                              <Text style={styles.outline}> Accept? </Text> 
-                          </View>
+      displayValues = <View style={{alignContent: 'center', width: "80%"}}> 
+                        <Text style={styles.outline}>We were able to extract the following information from this image: </Text> 
+                        
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> </Text> 
+                            <Text style={styles.outline}> Accept? </Text> 
+                        </View>
 
-                          <View style={styles.CheckBoxContainer}> 
-                              <Text style={styles.outline}> Amount:  {moneyText}</Text> 
-                              <CheckBox style={styles.checkBoxActual} disabled={!moneyOutput} value={this.state.moneyAccept} onValueChange={(newValue) => this.setState({moneyAccept: newValue})} /> 
-                          </View>
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> Amount:  {moneyText}</Text> 
+                            <CheckBox style={styles.checkBoxActual} disabled={!moneyOutput} value={this.state.moneyAccept} onValueChange={(newValue) => this.setState({moneyAccept: newValue})} /> 
+                        </View>
 
-                          <View style={styles.CheckBoxContainer}> 
-                              <Text style={styles.outline}> Date: {dateText} </Text>
-                              <CheckBox style={styles.checkBoxActual} disabled={!dateOutput} value={this.state.dateAccept} onValueChange={(newValue) => this.setState({dateAccept: newValue})} /> 
-                          </View>
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> Date: {dateText} </Text>
+                            <CheckBox style={styles.checkBoxActual} disabled={!dateOutput} value={this.state.dateAccept} onValueChange={(newValue) => this.setState({dateAccept: newValue})} /> 
+                        </View>
 
-                          <View style={styles.CheckBoxContainer}> 
-                              <Text style={styles.outline}> Category: {categoryText} </Text>
-                              <CheckBox style={styles.checkBoxActual} disabled={!categoryOutput} value={this.state.categoryAccept} onValueChange={(newValue) => this.setState({categoryAccept: newValue})} /> 
-                          </View>
-                      </View>
-
-      } else { 
-        displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
-      }
-
-      if (!moneyOutput && !dateOutput && !categoryOutput) {
-        displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
-      }
-
-      
-
-      let photoPanel 
-      if (this.state.images.length > 0) {
-
-        var photos = this.returnPhotos()
-        photoPanel = <View>
-                      <Text style={styles.label}>Photos for this receipt</Text>
-                      {photos}
+                        <View style={styles.CheckBoxContainer}> 
+                            <Text style={styles.outline}> Category: {categoryText} </Text>
+                            <CheckBox style={styles.checkBoxActual} disabled={!categoryOutput} value={this.state.categoryAccept} onValueChange={(newValue) => this.setState({categoryAccept: newValue})} /> 
+                        </View>
                     </View>
 
-      }
+    } else { 
+      displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
+    }
 
-        return(
-        
-          <SafeAreaView style={styles.outerContainer}>
+    if (!moneyOutput && !dateOutput && !categoryOutput) {
+      displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
+    }
 
-            <Image
-            source={background}
-            style={styles.large} />
+    
 
-            <ScrollView keyboardShouldPersistTaps='handled' style={styles.scrollView}>
+    let photoPanel 
+    if (this.state.images.length > 0) {
 
-              {/* <ImageBackground source={background} style={styles.image}> */}
+      var photos = this.returnPhotos()
+      photoPanel = <View>
+                    <Text style={styles.label}>Photos for this receipt</Text>
+                    {photos}
+                  </View>
 
-              <View style={styles.box}>
+    }
 
-              <Image style={styles.logo} source={logo} />
+      return(
+      
+        <SafeAreaView style={styles.outerContainer}>
 
-                <View style = {styles.textContainer}>
-                  <Text style = {styles.text} > Add new receipts here</Text>
+          <Image
+          source={background}
+          style={styles.large} />
+
+          <ScrollView keyboardShouldPersistTaps='handled' style={styles.scrollView}>
+
+            {/* <ImageBackground source={background} style={styles.image}> */}
+            {topBar()}
+            
+            <View style={styles.box}>
+
+            {/* <Image style={styles.logo} source={logo} /> */}
+
+            
+
+              <View style = {styles.textContainer}>
+                <Text style = {styles.text} > Add new receipts here</Text>
+                
+              </View>
+
+              <View style={styles.borderedBox}>
+
+              <ConfirmDialog
+                  title={this.state.successMessage}
+                  message="Would you like to add another receipt?"
+                  visible={this.state.dialogVisible}
+                  onTouchOutside={() => this.setState(baseState)}
+                  positiveButton={{
+                      title: "YES",
+                      onPress: () => this.setState(baseState)
+                  }}
+                  negativeButton={{
+                      title: "NO",
+                      onPress: () => this.props.navigation.navigate('receiptsView', 
+                                                                    this.state.allData)
+                  }}
+              />
+
+                <Modal 
+                  style={{margin: 0}} 
+                  visible={this.state.showImage}
+                  backdropOpacity={0.3}  >
+                  <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+                    
+
+                    {this.state.analysing && <Text> Analysing - please wait... </Text> }
+                    {this.state.analysing && <Image source={loading}/>}
+                    
+
+                    {!this.state.analysing && <Image source={{uri: this.state.displayImage}}
+                          style={{width: "80%", height: "65%", paddingVertical: 20}} />}
+
+                    {!this.state.analysing && displayValues }
+
+                    <TouchableOpacity
+                      style = {styles.photoButton}
+                        onPress = {this.closeButton}>
+                        <Text style = {styles.submitButtonText}> Close </Text>
+                    </TouchableOpacity>
+                  </SafeAreaView>
+                </Modal>
+
+
+
+                <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
+                  <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+                    
+                          <Image source={{uri: this.state.imageToDisplay}}
+                          style={{width: "80%", height: "65%", paddingVertical: 20}} />
+
+                    <TouchableOpacity
+                      style = {styles.photoButton}
+                      onPress = {this.closeButton2}>
+                        <Text style = {styles.submitButtonText}> Close </Text>
+                    </TouchableOpacity>
+
+                  </SafeAreaView>
+                </Modal>
+
+                <Text style={styles.label}>Amount</Text>
+
+                <Picker onValueChange={this.changeCurrency} style={styles.currencyBox} selectedValue={this.state.currency}>
+                  {this.currencyItems()}
+                </Picker>
+
+                <TextInput style = {styles.currencyInput}
+                      underlineColorAndroid = "transparent"
+                      type="number"
+                      id="value"
+                      name="vaue"
+                      value={this.state.amount}
+                      keyboardType="numeric"
+                      placeholder="Value"
+                      placeholderTextColor = "black"
+                      autoCapitalize = "none"
+                      onChangeText = {(amount) => this.amountHandler(amount)}/>
+
+                <Text style={styles.label}>Date of transaction</Text>
                   
+                {/* <Text onPress={this.showDatePicker} style={styles.dateInput}>{this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()}</Text> */}
+                  {/* <Icon onPress={this.showDatePicker} name={'caret-down'} size={15} color={'grey'}/> */}
+                
+                  <TouchableOpacity
+                        style={styles.dateInput}
+                        onPress = {this.showDatePicker}>
+                        <Text style={{fontSize:15}} > {this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()} </Text>
+                        <Icon style={{paddingRight: 15}} onPress={this.showDatePicker} name={'calendar'} size={15} color={'grey'}/>
+                  </TouchableOpacity>
+
+
+                {this.state.showDate && <DateTimePicker
+                  testID="dateTimePicker"
+                  value={this.state.date}
+                  // mode={mode}
+                  is24Hour={true}
+                  display="default"
+                  minimumDate={getStartOfFinancialYear()}
+                  maximumDate={new Date()}
+                  onChange={this.dateChange}
+                />}
+
+                {/* <DatePicker
+                    value={this.state.date}
+                    isOpen={this.state.showDate}
+                    confirmText={'OK'}
+                    cancelText={'Cancel'}
+                    onSelect={this.handleSelect}
+                    onCancel={this.handleCancel} 
+                    dateConfig={dateConfig}/> */}
+
+
+
+                <Text style={styles.label}>Category</Text>
+                
+                <View style={styles.categoryInput}>
+
+                  <Picker onValueChange={this.changeCategory} style={styles.categoryBox} selectedValue={this.state.category}>
+                    {this.categoryItems()}
+
+                  </Picker>
+
                 </View>
 
-                <View style={styles.borderedBox}>
-
-                <ConfirmDialog
-                    title={this.state.successMessage}
-                    message="Would you like to add another receipt?"
-                    visible={this.state.dialogVisible}
-                    onTouchOutside={() => this.setState(baseState)}
-                    positiveButton={{
-                        title: "YES",
-                        onPress: () => this.setState(baseState)
-                    }}
-                    negativeButton={{
-                        title: "NO",
-                        onPress: () => this.setState({returnToView: true})
-                    }}
-                />
+                <Text style={styles.label}>Images</Text>
+                
+                <View style={{width: "100%"}}>
+                  <TouchableOpacity
+                    style = {styles.photoButton}
+                    onPress = {
+                        () => this.setState({imageMethodMessage: true})
+                    }>
+                    <Text style = {styles.submitButtonText}> Add Image </Text>
+                  </TouchableOpacity>
 
                   <Modal 
                     style={{margin: 0}} 
-                    visible={this.state.showImage}
-                    backdropOpacity={0.3}  >
-                    <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
+                    visible={this.state.uploadingMessageShow}
+                    backdropOpacity={0}  >
+                    <SafeAreaView 
+                    style={{height: "50%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}
+                    >
                       
 
-                      {this.state.analysing && <Text> Analysing - please wait... </Text> }
-                      {this.state.analysing && <Image source={loading}/>}
+                      <Text> Uploading your receipt... </Text>
+                      <Image source={loading}/>
                       
 
-                      {!this.state.analysing && <Image source={{uri: this.state.displayImage}}
-                            style={{width: "80%", height: "65%", paddingVertical: 20}} />}
-
-                      {!this.state.analysing && displayValues }
-
-                      <TouchableOpacity
-                        style = {styles.photoButton}
-                          onPress = {this.closeButton}>
-                          <Text style = {styles.submitButtonText}> Close </Text>
-                      </TouchableOpacity>
-                    </SafeAreaView>
-                  </Modal>
-
-
-
-                  <Modal style={{margin: 0}} visible={this.state.displayPhoto}>
-                    <SafeAreaView style={{height: "100%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}>
-                      
-                            <Image source={{uri: this.state.imageToDisplay}}
-                            style={{width: "80%", height: "65%", paddingVertical: 20}} />
-
-                      <TouchableOpacity
-                        style = {styles.photoButton}
-                        onPress = {this.closeButton2}>
-                          <Text style = {styles.submitButtonText}> Close </Text>
-                      </TouchableOpacity>
 
                     </SafeAreaView>
                   </Modal>
 
-                  <Text style={styles.label}>Amount</Text>
-
-                  <Picker onValueChange={this.changeCurrency} style={styles.currencyBox} selectedValue={this.state.currency}>
-                    {this.currencyItems()}
-                  </Picker>
-
-                  <TextInput style = {styles.currencyInput}
-                        underlineColorAndroid = "transparent"
-                        type="number"
-                        id="value"
-                        name="vaue"
-                        value={this.state.amount}
-                        keyboardType="numeric"
-                        placeholder="Value"
-                        placeholderTextColor = "black"
-                        autoCapitalize = "none"
-                        onChangeText = {(amount) => this.amountHandler(amount)}/>
-
-                  <Text style={styles.label}>Date of transaction</Text>
-                    
-                  {/* <Text onPress={this.showDatePicker} style={styles.dateInput}>{this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()}</Text> */}
-                    {/* <Icon onPress={this.showDatePicker} name={'caret-down'} size={15} color={'grey'}/> */}
-                  
-                    <TouchableOpacity
-                          style={styles.dateInput}
-                          onPress = {this.showDatePicker}>
-                          <Text style={{fontSize:15}} > {this.state.date.getDate()} {months[this.state.date.getMonth()]} {this.state.date.getFullYear()} </Text>
-                          <Icon style={{paddingRight: 15}} onPress={this.showDatePicker} name={'calendar'} size={15} color={'grey'}/>
-                    </TouchableOpacity>
-
-
-                  {this.state.showDate && <DateTimePicker
-                    testID="dateTimePicker"
-                    value={this.state.date}
-                    // mode={mode}
-                    is24Hour={true}
-                    display="default"
-                    minimumDate={getStartOfFinancialYear()}
-                    maximumDate={new Date()}
-                    onChange={this.dateChange}
-                  />}
-
-                  {/* <DatePicker
-                      value={this.state.date}
-                      isOpen={this.state.showDate}
-                      confirmText={'OK'}
-                      cancelText={'Cancel'}
-                      onSelect={this.handleSelect}
-                      onCancel={this.handleCancel} 
-                      dateConfig={dateConfig}/> */}
-
-
-
-                  <Text style={styles.label}>Category</Text>
-                  
-                  <View style={styles.categoryInput}>
-
-                    <Picker onValueChange={this.changeCategory} style={styles.categoryBox} selectedValue={this.state.category}>
-                      {this.categoryItems()}
-
-                    </Picker>
-
-                  </View>
-
-                  <Text style={styles.label}>Images</Text>
-                  
-                  <View style={{width: "100%"}}>
-                    <TouchableOpacity
-                      style = {styles.photoButton}
-                      onPress = {
-                          () => this.setState({imageMethodMessage: true})
-                      }>
-                      <Text style = {styles.submitButtonText}> Add Image </Text>
-                    </TouchableOpacity>
-
-                    <Modal 
-                      style={{margin: 0}} 
-                      visible={this.state.uploadingMessageShow}
-                      backdropOpacity={0}  >
-                      <SafeAreaView 
-                      style={{height: "50%", width: "100%", backgroundColor: 'white', alignItems: 'center', paddingVertical: 20}}
-                      >
-                        
-
-                        <Text> Uploading your receipt... </Text>
-                        <Image source={loading}/>
-                        
-
-
-                      </SafeAreaView>
-                    </Modal>
-
-                  </View>
-
-                  {photoPanel}
-
-                  <ConfirmDialog
-                    title={"Adding an image for this receipt"}
-                    message="Which method would you like to use to add a receipt image?"
-                    visible={this.state.imageMethodMessage}
-                    onTouchOutside={() => this.setState({imageMethodMessage: false})}
-                    positiveButton={{
-                        title: "Camera",
-                        onPress: () => this.handleCamera()
-                    }}
-                    negativeButton={{
-                        title: "Upload",
-                        onPress: () => this.handleUpload()
-                    }}
-                    cancelButton={{
-                        title: "Cancel",
-
-                    }}
-                  />
-
-                  
-                  <TouchableOpacity
-                    style = {styles.doneButton}
-                    onPress = {
-                        () => this.submitReceipt()
-                    }>
-                    <Text style = {styles.submitButtonText}> Complete </Text>
-                  </TouchableOpacity>
-
-                  
-                  <TouchableOpacity
-                    style = {styles.utilityButton}
-                    onPress = {
-                        () => this.cancel()
-                    }>
-                    <Text style = {styles.submitButtonText}> Cancel </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style = {styles.utilityButton2}
-                    onPress = {
-                        () => this.reset()
-                    }>
-                    <Text style = {styles.submitButtonText}> Reset </Text>
-                  </TouchableOpacity>
                 </View>
 
+                {photoPanel}
+
+                <ConfirmDialog
+                  title={"Adding an image for this receipt"}
+                  message="Which method would you like to use to add a receipt image?"
+                  visible={this.state.imageMethodMessage}
+                  onTouchOutside={() => this.setState({imageMethodMessage: false})}
+                  positiveButton={{
+                      title: "Camera",
+                      onPress: () => this.handleCamera()
+                  }}
+                  negativeButton={{
+                      title: "Upload",
+                      onPress: () => this.handleUpload()
+                  }}
+                  cancelButton={{
+                      title: "Cancel",
+
+                  }}
+                />
+
+                
+                <TouchableOpacity
+                  style = {styles.doneButton}
+                  onPress = {
+                      () => this.submitReceipt()
+                  }>
+                  <Text style = {styles.submitButtonText}> Complete </Text>
+                </TouchableOpacity>
+
+                
+                <TouchableOpacity
+                  style = {styles.utilityButton}
+                  onPress = {
+                      () => this.cancel()
+                  }>
+                  <Text style = {styles.submitButtonText}> Cancel </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style = {styles.utilityButton2}
+                  onPress = {
+                      () => this.reset()
+                  }>
+                  <Text style = {styles.submitButtonText}> Reset </Text>
+                </TouchableOpacity>
+              </View>
 
 
-                {/* <Button onPress={this.signOut} title="Sign Out" />   */}
 
-              </View>  
+              {/* <Button onPress={this.signOut} title="Sign Out" />   */}
 
-            
-          </ScrollView>
-        </SafeAreaView>
-      
+            </View>  
 
-      )
+          
+        </ScrollView>
+      </SafeAreaView>
+    
 
-    }
+    )
+
+    
 
   }  
 

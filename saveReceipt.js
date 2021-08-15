@@ -20,7 +20,7 @@ export async function saveReceipt (currency, amount, date, category, images) {
 
     var amountFloat = parseFloat(amount)
 
-    console.log(data)
+    // console.log(data)
 
     var categoryCount = new Array(categories.length).fill(0);
     var categoryTotals = new Array(categories.length).fill(0);
@@ -34,13 +34,16 @@ export async function saveReceipt (currency, amount, date, category, images) {
 
     if (numberImages > 0) {
         listURLs = await uploadImages(images, financialYear(), UserID)}
-        
+    
+    
+    var dateFirebase = firebase.firestore.Timestamp.fromDate(date)
+    var loggedFirebase = firebase.firestore.Timestamp.fromDate(new Date())
+    
 
     // If the user has existing receipt data, append to that
     if (data) {
 
         var receipts = data.receipts + 1
-
 
         categoryCount = data.categoryCount
         categoryCount[category] += 1
@@ -62,9 +65,9 @@ export async function saveReceipt (currency, amount, date, category, images) {
         var receiptCurrentDetails = {
                 currency,
                 amount: amountFloat,
-                date,
+                date: dateFirebase,
                 category,
-                logged: new Date,
+                logged: loggedFirebase,
                 listURLs,
                 updated: null
             }
@@ -126,9 +129,9 @@ export async function saveReceipt (currency, amount, date, category, images) {
     receiptDetails = [{
             currency,
             amount: amountFloat,
-            date,
+            date: dateFirebase,
             category,
-            logged: new Date,
+            logged: loggedFirebase,
             listURLs,
             updated: null
         }]
@@ -160,7 +163,7 @@ export async function saveReceipt (currency, amount, date, category, images) {
 
     }
     
-    return true
+    return {receipts, currencyCount, currencyTotals, categoryCount, categoryTotals, receiptDetails}
 
 }
 

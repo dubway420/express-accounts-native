@@ -4,7 +4,6 @@ import fire from './fire'
 import {styles} from './styles'
 import background from './background.jpg'
 import logo from './logo.png'
-import Receipts from './Receipts'
 import { categories, months, currencies } from './constants'
 import { screenWidth } from './extras'
 import { makeCategoryChart, monthListFull, makeMonthlyChart } from './graphStuff'
@@ -18,6 +17,8 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import firebase from 'firebase'
 import { updateReceipts, deleteReceipts } from './saveReceipt'
+import { topBar } from './topBar'
+import SplashScreen from './splashScreen'
 
 import ImageViewing from "./ImageViewing";
 import ImageList from "./components/ImageList";
@@ -110,7 +111,8 @@ export class ReceiptsView extends Component{
 
         editSaved: false,
 
-        deleteButtonPressed: false
+        deleteButtonPressed: false,
+        showSplash: true
 
     };
 
@@ -576,6 +578,8 @@ export class ReceiptsView extends Component{
       <SafeAreaView style={styles.tableView}>
         
       <ScrollView keyboardShouldPersistTaps='handled' horizontal={true}>
+
+          
           <View>
 
             <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -853,16 +857,15 @@ monthlyTable () {
 
 }
 
-  componentDidMount(){
+componentDidMount = async () => {
 
-    console.log("componentDidMount: receipts view")
-    
-    this.loadData()
-    
+  console.log("componentDidMount: receipts view")
+  
+  this.loadData()
 
-  }
+}
 
- loadData() {
+ loadData = async () => {
    
   var UserID = fire.auth().currentUser.uid
     
@@ -885,11 +888,14 @@ monthlyTable () {
 
                         latestReceiptDate: data.latestReceiptDate,
                         latestReceiptSubmitDate: data.latestReceiptSubmitDate,
-                        receiptDetails: data.receiptDetails
+                        receiptDetails: data.receiptDetails,
+                        showSplash: false,
         })
 
     }
   }) 
+
+  return true
 
 }
 
@@ -1016,15 +1022,6 @@ monthlyTable () {
     receiptsAll[this.state.receiptIndex].date = firebaseDate
     this.setState({editDate: null})
 
-    // TODO fix this 
-    // if (firebaseDate.seconds > this.state.latestReceiptDate.seconds) {
-    //   this.setState({latestReceiptDate: firebaseDate})
-    // }
-    // if (firebaseDate.seconds < this.state.firstReceiptDate.seconds) {
-    //   this.setState({firstReceiptDate: firebaseDate})
-    // }
-
-
   }
   
   if (this.state.editCategory) {
@@ -1062,8 +1059,18 @@ monthlyTable () {
     }
    else {
     Alert.alert('Error', 'We encountered an error whilst trying to save your changes. Please try again.')
-    // this.loadData() 
+  
    }
+
+}
+
+static getDerivedStateFromProps(props, state) {
+  
+  if (props.route.params) {
+    return props.route.params }
+  else {
+    return null 
+  }
 
 }
 
@@ -1098,45 +1105,12 @@ deleteReceipt = async () => {
   currencyCount[currency] = currencyCount[currency] - 1
   currencyTotals[currency] = currencyTotals[currency] - this.state.amount
 
-  // check if the receipt being deleted was any one of the first/latest date/logged
-  // var deletedMatches = false
-
-
-  // if (firebase.firestore.Timestamp.fromDate(this.state.convertedDate).seconds == this.state.firstReceiptDate.seconds ) {
-  //   deletedMatches = true    
-  // }
-
-  // if (firebase.firestore.Timestamp.fromDate(this.state.convertedDate).seconds == this.state.latestReceiptDate.seconds ) {
-  //   deletedMatches = true
-  // }
-
-
-  // if (firebase.firestore.Timestamp.fromDate(this.state.loggedConverted).seconds == this.state.firstReceiptSubmitDate.seconds ) {
-  //   deletedMatches = true
-  // }
-
-  // if (firebase.firestore.Timestamp.fromDate(this.state.loggedConverted).seconds == this.state.latestReceiptSubmitDate.seconds ) {
-  //   deletedMatches = true
-  // }
-
 
   var firstReceiptDate = this.state.firstReceiptDate
   var latestReceiptDate = this.state.latestReceiptDate
 
   var firstReceiptSubmitDate = this.state.firstReceiptSubmitDate
   var latestReceiptSubmitDate = this.state.latestReceiptSubmitDate
-
-  // console.log(deletedMatches)
-
-
-  // var receiptDateSeconds, receiptLoggedSeconds
-  // // for each item in receiptsAll, get the date
-  // for (var i = 0; i < receiptsAll.length; i++) {
-  //   var receiptDateSeconds = firebase.firestore.Timestamp.fromDate(receiptsAll[i].date).seconds
-  //   var receiptLoggedSeconds = firebase.firestore.Timestamp.fromDate(receiptsAll[i].logged).seconds
-  // }
-
-
 
   this.setState({receipts,
                   receiptsSorted: receiptsAll,
@@ -1164,17 +1138,15 @@ deleteReceipt = async () => {
   render() {
     
     console.log("render")
-
-    if (this.state.addReceipt) {
-      
-        return (
-        <Receipts/>
+    
+    if (this.state.showSplash) {
+      return (
+        <SplashScreen/>
       )
-
-    } else if (this.state.showReceiptsList) {
+    }
+    if (this.state.showReceiptsList) {
 
       return (this.receiptListModal())
-
 
     }
     
@@ -1192,32 +1164,7 @@ deleteReceipt = async () => {
 
             <ScrollView style={styles.scrollView}>
 
-            <View backgroundColor={"white"} style={styles.topBar} >
-
-              <TouchableOpacity
-                style = {{paddingLeft: 5, paddingTop: 5}}
-                onPress = {() => this.setState({deleteButtonPressed: true})}
-                >
-                  
-                <Icon 
-                //  onPress = {() => this.setState({deleteButtonPressed: true})}
-                  name={"bars"} size={35} style={{color: "grey"}} />
-              </TouchableOpacity>
-
-              <Image source={logo} style={styles.logoTop} />
-
-              <TouchableOpacity  
-                        style = {{paddingRight: 5}}
-                        onPress = {() => this.setState({deleteButtonPressed: true})}
-                        >
-                          
-                        <Icon 
-                        //  onPress = {() => this.setState({deleteButtonPressed: true})}
-                         name={"users"} size={30} style={{color: "grey"}} />
-                      </TouchableOpacity>
-
-             
-            </View>
+            {topBar()}
 
             <View style={styles.box}>
 
@@ -1231,7 +1178,7 @@ deleteReceipt = async () => {
                   <TouchableOpacity
                         style = {styles.doneButton}
                         onPress = {
-                          () => this.setState({addReceipt: true})
+                          () => this.props.navigation.navigate('receipts')
                         }>
                         <Text style = {styles.submitButtonText}> Add Receipt </Text>
                       </TouchableOpacity>
@@ -1247,7 +1194,7 @@ deleteReceipt = async () => {
 
 
 
-                <Button onPress={this.signOut} title="Sign Out" />  
+                {/* <Button onPress={this.signOut} title="Sign Out" />   */}
 
             </View>  
 
