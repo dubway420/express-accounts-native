@@ -155,7 +155,7 @@ function currencyDataMaker (data) {
 
   var x = -1
 
-  var data = indexedData.slice(0, 5).map(function(e) { x += 1
+  var data = indexedData.map(function(e) { x += 1
               return {
                       name: currencies[e.ind].name, 
                       value: e.val, 
@@ -301,6 +301,8 @@ export function monthListFull (receipts)  {
     return data
 
 } 
+
+
 
 
 // determine if a date is later than 5th of april

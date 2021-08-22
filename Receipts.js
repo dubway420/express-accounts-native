@@ -20,7 +20,7 @@ import CheckBox from '@react-native-community/checkbox';
 import {saveReceipt} from './saveReceipt'
 import ReceiptsView from './receiptsView'
 import { ConfirmDialog, ProgressDialog } from 'react-native-simple-dialogs';
-import {amountValid, getStartOfFinancialYear} from './utils'
+import {amountValid, getStartOfFinancialYear, isInCurrentFinancialYear} from './utils'
 import {topBar} from './topBar'
 
 // Firebase sets some timeers for a long period, which will trigger some warnings. Let's turn that off for this example
@@ -359,7 +359,14 @@ export default class Receipts extends Component{
     var dateOutput = false
     var categoryOutput = false
 
-    if (this.state.valid) {
+    
+
+    // console.log() 
+    // {
+    //   var currentFinancialYear = getStartOfFinancialYear()
+    //   displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> The date that appears on this receipt, {date.day + "/" + date.month + "/" + date.year}, is before the current financial year. Please choose a receipt that is dated within the current financial year (on or after {currentFinancialYear.getDate() + "/" + currentFinancialYear.getMonth() + 1 + "/" + currentFinancialYear.getFullYear()}) </Text>
+    // }
+    if (isInCurrentFinancialYear(date) && this.state.valid) {
 
       let moneyText
       if (money.value) {moneyText = currencies[money.currency].symbol + money.value
@@ -407,6 +414,15 @@ export default class Receipts extends Component{
 
     if (!moneyOutput && !dateOutput && !categoryOutput) {
       displayValues = <Text style={{alignSelf: 'center', width: "80%"}}> We're sorry, we were unable to extract any information from this image. Please provide a clear image of a receipt or bill. </Text>
+    }
+
+    if (!isInCurrentFinancialYear(date)) {
+      var currentFinancialYear = getStartOfFinancialYear()
+      displayValues = <View style={{width: "80%"}}>  
+                        <Text style={{alignSelf: 'center', width: "80%"}}>The date that appears on this receipt: </Text> 
+                        <Text style={{textAlign: 'center', width: "80%"}}>{date.day + "/" + date.month + "/" + date.year} </Text>
+                        <Text style={{alignSelf: 'center', width: "80%"}} >is before the current financial year. Please choose a receipt that is dated within the current financial year (on or after {currentFinancialYear.getDate() + "/" + currentFinancialYear.getMonth() + 1 + "/" + currentFinancialYear.getFullYear() + ")"}  </Text> 
+                      </View>
     }
 
     

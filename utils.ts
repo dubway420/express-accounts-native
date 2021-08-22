@@ -238,3 +238,13 @@ export function getStartOfFinancialYear() {
   }
 
 }
+
+// determine if a date is in the current financial year
+export function isInCurrentFinancialYear(date) {
+  if (date) {
+    var startOfFinancialYear = getStartOfFinancialYear()
+
+    return new Date(date.year, date.month, date.day) > startOfFinancialYear}
+  else {
+    return true}  
+}

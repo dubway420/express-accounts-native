@@ -10,7 +10,7 @@
    },
    "android": {
      "package": "com.express.android",
-     "versionCode": 4
+     "versionCode": 6
    }
   }
 }
