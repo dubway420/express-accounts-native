@@ -1,6 +1,6 @@
-export const version = "A0.3.0"
+export const version = "A0.4.0"
 
-export const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+export const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 export const currencies = [
   {
@@ -57,12 +57,8 @@ export const categories = [
 
                            {name: "Rent",
                             meta: ["monthly", "garage", "shop", "office", "premises"]},
-
-
-                           {names: "taxes",
-                            meta: ["tax", "council", "rates"]}, 
                             
-                            
+
                            {name: "Equipment and Tools",
                             meta: ["hammer", "saw", "driver"]},
                             
@@ -78,8 +74,8 @@ export const categories = [
                                    "deck", "plaster", "glue", "adhesive", "nuts", "bolts", "washer", 
                                    "carpet"]},
 
-                          //  {name: "Plant and Machinery",
-                          //   meta: ["machine", "plant"]},
+                           {name: "Plant and Machinery",
+                            meta: ["machine", "plant"]},
 
                            {name: "Vehicle Hire",
                             meta: ["avis", "europcar", "enterprise"]},
@@ -146,7 +142,7 @@ export const categories = [
                            
                                   
                            {name: "Advertising and Promotion",
-                            meta: ["ad", "radio", "billboard", "TV", "announcement", "sponsor",
+                            meta: ["radio", "billboard", "TV", "announcement", "sponsor",
                                    "media", "social", "facebook", "twitter", "instagram"]},
                               
 
@@ -156,7 +152,11 @@ export const categories = [
                               
 
                           //  {name: "Sundry",
-                          //   meta: []}
+                          //   meta: []},
+
+                            
+                           {name: "Taxes",
+                            meta: ["tax", "council", "rates"]},  
 
 ]
 

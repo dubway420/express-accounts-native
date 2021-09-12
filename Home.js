@@ -40,7 +40,7 @@ class Home extends Component{
     await this.worker.initialize('eng');
     const { data: { text } } = await this.worker.recognize(this.state.file);
 
-    console.log(text)
+    // console.log(text)
 
     var extracted = extractData(String(text))
 
@@ -80,7 +80,7 @@ class Home extends Component{
 
   setText(input){
     
-    console.log("out:" + input)
+    // console.log("out:" + input)
 
     if (!input) {
       return "Please select a receipt"   

@@ -1,23 +1,32 @@
 import fire from './fire'
 import Login from './Login'
-import EmailNotVerified from './emailNotVerified'
+import { Signup } from './Signup'
 import React from "react"
-import ImageExtract from './ImageExtract'
+import ReceiptsView from './receiptsView'
+import Receipts from './Receipts'
+import SplashScreen from './splashScreen'
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
 
 
 class App extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      file: null,
       user: null,
-      signup: {},
-      emailVerified: false
+      loginResolved: false
+      
     }
 
   }
 
   componentDidMount() {
+    
+    // firebase logout
+    // fire.auth().signOut()
 
     this.authListener();
 
@@ -29,18 +38,17 @@ class App extends React.Component {
 
     fire.auth().onAuthStateChanged((user)=>{
       
+      
+
       if(user){
         
-        var emailVerified = fire.auth().currentUser.emailVerified
-        this.setState({user: user,
-                       emailVerified: emailVerified})
+        this.setState({user: user})
+        
+      } 
 
-      }  
-      else {
-        this.setState({user : null})
-      }
+      this.setState({loginResolved: true})
 
-
+      
     })
 
   }  
@@ -49,33 +57,44 @@ class App extends React.Component {
 
   render() {
     
-    var db = fire.firestore()
+      if (this.state.loginResolved) {
 
-    if (!this.state.user){
-      
+        if (this.state.user) {
 
-      return (
-          <Login/>)
-            
-    } else if (!this.state.user.emailVerified) {
+          return (
+            <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen name="receiptsView" component={ReceiptsView} options={{ headerShown: false }} />
+                <Stack.Screen name="receipts" component={Receipts} options={{ headerShown: false }} />
+                </Stack.Navigator>  
+            </NavigationContainer>
+          )
           
+        } else {
+          return (
+            <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="Login"
+                  component={Login}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name="Sign up" component={Signup} options={{ headerShown: false }}/>
+                <Stack.Screen name="receiptsView" component={ReceiptsView} options={{ headerShown: false }} />
+                <Stack.Screen name="receipts" component={Receipts} options={{ headerShown: false }} />
+              </Stack.Navigator>
+            </NavigationContainer>
+            );
+        }
+      }
+
+      else {
         return (
-        <EmailNotVerified/>
-        )
-    } 
-    else {
-        return (
-        <ImageExtract/>
+          <SplashScreen/>
         )
       }
-      }
-  
 
-
-  
-
-  
-
+  }
 }
 
 export default App

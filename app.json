@@ -1,0 +1,17 @@
+{
+  "expo": {
+   "name": "Express Accounts",
+   "icon": "./icon.png",
+   "version": "1.0.0",
+   "slug": "your-app-slug",
+   "ios": {
+     "bundleIdentifier": "com.express.ios",
+     "buildNumber": "1.0.0"
+   },
+   "android": {
+     "package": "com.express.android",
+     "versionCode": 6
+   }
+  }
+}
+

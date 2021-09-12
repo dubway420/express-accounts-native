@@ -4,7 +4,7 @@ import {styles} from './styles'
 import background from './background.jpg'
 import logo from './logo.png'
 import fire from './fire'
-import ImageExtract from './ImageExtract'
+import Receipts from "./Receipts";
 
 export class EmailNotVerified extends Component{
   constructor(props){
@@ -101,7 +101,7 @@ export class EmailNotVerified extends Component{
       
       )} else {
         return (
-          <ImageExtract/>
+          <Receipts/>
         )
 
       }

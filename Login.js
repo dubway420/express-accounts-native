@@ -9,8 +9,8 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 
 var baseState = {
 
-  email : "test",
-  password : "test",
+  email : "",
+  password : "",
   password_see: false,
 
   fname: "",
@@ -27,8 +27,23 @@ class Login extends Component{
     super(props)
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
+    this.emailHandler = this.emailHandler.bind(this);
     
     this.state=baseState
+
+  }
+
+  emailHandler(email) {
+    
+    // if the last character of email is a space, remove it
+    if (email[email.length - 1] === ' ') {
+      email = email.substring(0, email.length - 1);
+    }
+
+    this.setState({
+      email: email.toLowerCase(),
+      error: false
+    })
 
   }
 
@@ -40,6 +55,8 @@ class Login extends Component{
       
 
     }).catch((err)=>{
+
+      console.log(err)
       
       this.setState({error: true})
     })
@@ -48,17 +65,19 @@ class Login extends Component{
 
   register(e){
 
-    this.setState({signup: true})
+    // this.setState({signup: true})
+    this.props.navigation.navigate('Sign up')
  
   }
 
-
+  componentDidMount(){
+    console.log("componentDidMount: login")
+  }
 
   
   render() {
 
-    if (!this.state.signup) {
-      return(
+       return(
       
         <SafeAreaView style={styles.outerContainer}>
 
@@ -66,7 +85,7 @@ class Login extends Component{
           source={background}
           style={styles.large} />
 
-          <ScrollView style={styles.scrollView}>
+          <ScrollView keyboardShouldPersistTaps='handled' style={styles.scrollView}>
 
             {/* <ImageBackground source={background} style={styles.image}> */}
 
@@ -88,11 +107,12 @@ class Login extends Component{
                 placeholder="Enter email address"
                 placeholderTextColor = "black"
                 autoCapitalize = "none"
-                onChangeText = {(email) => { this.setState({ email: email, error: false})}}/>
+                value={this.state.email}
+                onChangeText = {this.emailHandler}/>
               
-              <View style = {styles.input}>
+              <View style = {styles.inputAlt}>
                   
-                  <TextInput style={styles.inputAlt}
+                <TextInput style={styles.inputAltInner}
                 underlineColorAndroid = "transparent"
                 type="password"
                 id="password"
@@ -137,12 +157,7 @@ class Login extends Component{
       </SafeAreaView>
     
 
-    )} else {
-      return (
-        <Signup/>
-
-      )
-    }
+    )
 
   }
 
