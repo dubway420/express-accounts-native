@@ -2,7 +2,7 @@
   "expo": {
    "name": "Express Accounts",
    "icon": "./icon.png",
-   "version": "1.0.0",
+   "version": "1.2.0",
    "slug": "your-app-slug",
    "ios": {
      "bundleIdentifier": "com.express.ios",
@@ -10,7 +10,7 @@
    },
    "android": {
      "package": "com.express.android",
-     "versionCode": 6
+     "versionCode": 7
    }
   }
 }

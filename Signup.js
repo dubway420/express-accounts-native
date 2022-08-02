@@ -6,6 +6,9 @@ import {styles} from './styles'
 import background from './background.jpg'
 import logo from './logo.png'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import { passwordHandler } from './handlers.js'
+import CheckBox from '@react-native-community/checkbox';
+import { Linking } from 'react-native';
 
 var baseState = {
 
@@ -37,11 +40,14 @@ var baseState = {
 
   sname_valid: false,
   sname: "",
-  fname_valid: false,
+  sname_warn: false,
 
-  fnumber_valid: false,
-  fnumber: "",
-  fnumber_warn: false,
+  acceptPrivacyPolicy: false,
+  acceptPrivacyPolicy_warn: false,
+
+  // fnumber_valid: false,
+  // fnumber: "",
+  // fnumber_warn: false,
 
   error: "",
 
@@ -56,7 +62,7 @@ export class Signup extends Component{
     this.cancel = this.cancel.bind(this);
     this.signup = this.signup.bind(this);
     this.emailHandler = this.emailHandler.bind(this);   
-    this.passwordHandler = this.passwordHandler.bind(this); 
+    // this.passwordHandler = this.passwordHandler.bind(this); 
     this.registrationVerification = this.registrationVerification.bind(this);
     this.state=baseState
 
@@ -78,17 +84,17 @@ export class Signup extends Component{
 
   }
 
-  passwordHandler(password) { 
+  // passwordHandler(password) { 
                           
-    var passwordValidation = passwordVerifier(password)
+  //   var passwordValidation = passwordVerifier(password)
 
-    this.setState({ 
-        password_warn: false,
-        pvalid8: passwordValidation[0],
-        pvalidUpperLower: passwordValidation[1],
-        pvalidNumbers: passwordValidation[2],
-        password: password})
-      }
+  //   this.setState({ 
+  //       password_warn: false,
+  //       pvalid8: passwordValidation[0],
+  //       pvalidUpperLower: passwordValidation[1],
+  //       pvalidNumbers: passwordValidation[2],
+  //       password: password})
+  //     }
 
   
 
@@ -132,8 +138,8 @@ export class Signup extends Component{
       this.setState({sname_warn: true})
       valid -= 1
     }
-    if (!this.state.fnumber_valid) {
-      this.setState({fnumber_warn: true})
+    if (!this.state.acceptPrivacyPolicy) {
+      this.setState({acceptPrivacyPolicy_warn: true})
       valid -= 1
     }
 
@@ -155,14 +161,10 @@ export class Signup extends Component{
 
       fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
         
-        // const user = fire.auth().currentUser
-
-        // user.displayName = this.state.fname + " " + this.state.sname 
-        // user.phoneNumber = this.state.fnumber
+        console.log(this.state.fnumber)
 
         u.user.updateProfile({
           displayName: this.state.fname + " " + this.state.sname,
-          phoneNumber: this.state.fnumber
         })
 
         u.user.sendEmailVerification().then(function() {
@@ -200,7 +202,7 @@ export class Signup extends Component{
 
 
             <Image style={styles.logo} source={logo} />
-            <Text style = {styles.text} >Please fill out all of the fields below:</Text>
+            <Text style = {styles.text && {borderBottomWidth: 1, alignSelf: 'center', marginTop: 20}} >Please fill out all of the fields below:</Text>
 
             
 
@@ -234,7 +236,7 @@ export class Signup extends Component{
                       autoCapitalize = "none"
                       secureTextEntry={!this.state.password_see}
                       underlineColorAndroid="transparent"
-                      onChangeText = {(password) => this.passwordHandler(password)}/>
+                      onChangeText = {(password) => passwordHandler(this, password)}/>
 
                   <Icon style={styles.searchIcon} onPress={
                     () => this.setState({password_see: !this.state.password_see})} name={this.state.password_see ? "eye-slash" : "eye"} size={20} color="#000"/>
@@ -293,7 +295,9 @@ export class Signup extends Component{
 
             {this.state.password_check_message && <Text style={this.state.password_check_valid ? styles.passwordCorrect : styles.error}>{this.state.password_check_message}</Text>}
             
-            {this.state.fname_warn && <Text style={styles.error}>Error: Please provide a first name.</Text>}
+            <Text style={{ textAlign: 'center', marginTop: 10, borderBottomWidth: 1 }}> </Text>
+
+            {this.state.fname_warn && <Text style={styles.error}>Error: Please provide a valid first name.</Text>}
             {/* <View style = {styles.textContainer}> */}
 
                 <TextInput style = {styles.input}
@@ -309,7 +313,7 @@ export class Signup extends Component{
                                                                  fname_valid: nameVerifier(fname),
                                                                  fname_warn: false})}}/>
 
-            {this.state.sname_warn && <Text style={styles.error}>Error: Please provide a surname.</Text>}
+            {this.state.sname_warn && <Text style={styles.error}>Error: Please provide a valid surname.</Text>}
 
                 <TextInput style = {styles.input}
                     underlineColorAndroid = "transparent"
@@ -324,7 +328,7 @@ export class Signup extends Component{
                                                                  sname_valid: nameVerifier(sname),
                                                                  sname_warn: false})}}/>
 
-            {this.state.fnumber_warn && <Text style={styles.error}>Error: Invalid telephone number.</Text>}
+            {/* {this.state.fnumber_warn && <Text style={styles.error}>Error: Invalid telephone number.</Text>}
                 <TextInput style = {styles.input}
                     underlineColorAndroid = "transparent"
                     type="tel"
@@ -337,9 +341,27 @@ export class Signup extends Component{
                     autoCapitalize = "none"
                     onChangeText = {(fnumber) => { this.setState({ fnumber: fnumber, 
                                                                    fnumber_valid: phoneNumberVerifier(fnumber),
-                                                                   fnumber_warn: false})}}/>      
+                                                                   fnumber_warn: false})}}/>       */}
             
             {/* </View> */}
+
+          {this.state.acceptPrivacyPolicy_warn && <Text style={styles.error}> Please indicate that you have read the privacy policy. </Text>}
+          <View style={{flexDirection: "row", alignItems: "center", marginLeft: 10}}>
+
+            <CheckBox
+              disabled={false}
+              value={this.state.acceptPrivacyPolicy}
+              onValueChange={(newValue) => this.setState({acceptPrivacyPolicy: newValue})}
+            />
+
+          <Text id="message" style={{color: "blue", marginTop: 10,
+                      marginLeft: 20,
+                      marginBottom: 10,
+                      alignSelf: 'center'}}
+                      onPress={() => Linking.openURL('https://www.termsfeed.com/live/9a4c53e1-5df9-4ac0-9c2b-130f3df1ff23')}> I have read the privacy policy </Text>
+
+
+          </View>  
 
             <TouchableOpacity
                 style = {styles.submitButton}

@@ -70,8 +70,8 @@ export const styles = StyleSheet.create({
     // marginVertical: 1,
       },  
     logoTop: {
-      height: 40,
-      width: '90%',
+      height: 20,
+      width: '50%',
       // alignSelf: 'center',
       marginVertical: 10,
       flex: 1,
@@ -93,6 +93,7 @@ export const styles = StyleSheet.create({
        marginVertical: 10
     },  
     text: {
+      marginTop: 10,
       marginLeft: 20,
       alignSelf: 'center'
     },
@@ -283,6 +284,19 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff',
     color: '#424242',
   },
+  inputAltEdit: {flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  margin: 15,
+  height: 40,
+  borderColor: '#61040f',
+  borderWidth: 1,
+  // padding: 5,
+  width: '90%',
+  backgroundColor: '#fff',
+  color: '#424242'},
+  
   inputAltInner: {
     // flex:1,
     // flexDirection: 'row',

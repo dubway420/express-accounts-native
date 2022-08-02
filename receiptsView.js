@@ -61,10 +61,10 @@ export class ReceiptsView extends Component {
       currencyCount: [],
       currencyTotals: [],
 
-      firstReceiptDate: null,
-      firstReceiptSubmitDate: null,
-      latestReceiptDate: null,
-      latestReceiptSubmitDate: null,
+      // firstReceiptDate: null,
+      // firstReceiptSubmitDate: null,
+      // latestReceiptDate: null,
+      // latestReceiptSubmitDate: null,
 
       receiptDetails: [],
 
@@ -973,6 +973,8 @@ export class ReceiptsView extends Component {
 
     this.loadData()
 
+    // this.setState({ showSplash: false })
+
   }
 
   loadData = async () => {
@@ -994,19 +996,22 @@ export class ReceiptsView extends Component {
           currencyCount: data.currencyCount,
           currencyTotals: data.currencyTotals,
 
-          firstReceiptDate: data.firstReceiptDate,
-          firstReceiptSubmitDate: data.firstReceiptSubmitDate,
+          // firstReceiptDate: data.firstReceiptDate,
+          // firstReceiptSubmitDate: data.firstReceiptSubmitDate,
 
-          latestReceiptDate: data.latestReceiptDate,
-          latestReceiptSubmitDate: data.latestReceiptSubmitDate,
+          // latestReceiptDate: data.latestReceiptDate,
+          // latestReceiptSubmitDate: data.latestReceiptSubmitDate,
           receiptDetails: data.receiptDetails,
+          showSplash: false
 
         })
 
       }
-    })
 
-    this.setState({ showSplash: false })
+      else {
+        this.setState({showSplash: false})
+      }
+    })
 
     return true
 
@@ -1169,7 +1174,7 @@ export class ReceiptsView extends Component {
     })
 
 
-    const changesSaved = await updateReceipts(categoryCount, categoryTotals, currencyCount, currencyTotals, this.state.firstReceiptDate, this.state.latestReceiptDate, receiptsAll)
+    const changesSaved = await updateReceipts(categoryCount, categoryTotals, currencyCount, currencyTotals, receiptsAll)
 
     this.receiptList()
     if (changesSaved) {
@@ -1225,11 +1230,11 @@ export class ReceiptsView extends Component {
     currencyTotals[currency] = currencyTotals[currency] - this.state.amount
 
 
-    var firstReceiptDate = this.state.firstReceiptDate
-    var latestReceiptDate = this.state.latestReceiptDate
+    // var firstReceiptDate = this.state.firstReceiptDate
+    // var latestReceiptDate = this.state.latestReceiptDate
 
-    var firstReceiptSubmitDate = this.state.firstReceiptSubmitDate
-    var latestReceiptSubmitDate = this.state.latestReceiptSubmitDate
+    // var firstReceiptSubmitDate = this.state.firstReceiptSubmitDate
+    // var latestReceiptSubmitDate = this.state.latestReceiptSubmitDate
 
     this.setState({
       receipts,
@@ -1244,7 +1249,7 @@ export class ReceiptsView extends Component {
       editSaved: false
     })
 
-    const changesSaved = await deleteReceipts(receipts, categoryCount, categoryTotals, currencyCount, currencyTotals, firstReceiptDate, latestReceiptDate, firstReceiptSubmitDate, latestReceiptSubmitDate, receiptsAll)
+    const changesSaved = await deleteReceipts(receipts, categoryCount, categoryTotals, currencyCount, currencyTotals, receiptsAll)
     this.receiptList()
     if (changesSaved) {
       Alert.alert('Changes Saved', 'Your changes have been saved.')
@@ -1285,7 +1290,7 @@ export class ReceiptsView extends Component {
 
           <ScrollView style={styles.scrollView}>
 
-            {topBar()}
+            {topBar(this.props.navigation, "grey")}
 
             <View style={styles.box}>
 

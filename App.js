@@ -4,8 +4,9 @@ import { Signup } from './Signup'
 import React from "react"
 import ReceiptsView from './receiptsView'
 import Receipts from './Receipts'
-// import {displayValues} from './testSpace'
 import SplashScreen from './splashScreen'
+import settingsPage from './settingsPage'
+import { topBar } from './topBar'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -65,9 +66,17 @@ class App extends React.Component {
           return (
             <NavigationContainer>
               <Stack.Navigator>
-                <Stack.Screen name="receiptsView" component={ReceiptsView} options={{ headerShown: false }} />
-                <Stack.Screen name="receipts" component={Receipts} options={{ headerShown: false }} />
-                </Stack.Navigator>  
+                  <Stack.Screen name="receiptsView" component={ReceiptsView} options={{ headerShown: false }} />
+                  <Stack.Screen name="receipts" component={Receipts} options={{ headerShown: false }} />
+                  <Stack.Screen name="settingsPage" component={settingsPage} options={{ headerShown: false }} />
+                  <Stack.Screen name="topBar" component={topBar} options={{ headerShown: false }} />
+    
+                <Stack.Screen
+                  name="Login"
+                  component={Login}
+                  options={{ headerShown: false }}
+                />
+              </Stack.Navigator>  
             </NavigationContainer>
           )
           
@@ -83,6 +92,8 @@ class App extends React.Component {
                 <Stack.Screen name="Sign up" component={Signup} options={{ headerShown: false }}/>
                 <Stack.Screen name="receiptsView" component={ReceiptsView} options={{ headerShown: false }} />
                 <Stack.Screen name="receipts" component={Receipts} options={{ headerShown: false }} />
+                <Stack.Screen name="settingsPage" component={settingsPage} options={{ headerShown: false }} />
+                <Stack.Screen name="topBar" component={topBar} options={{ headerShown: false }} />
               </Stack.Navigator>
             </NavigationContainer>
             );

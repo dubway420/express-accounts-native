@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@react-native-community/checkbox": "^0.5.8",
+    "@react-native-community/checkbox": "^0.5.12",
     "@react-native-community/datetimepicker": "^3.5.2",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-picker/picker": "^1.16.3",
@@ -13,6 +13,7 @@
     "expo-auth-session": "~3.2.3",
     "expo-image-picker": "^10.2.2",
     "expo-random": "~11.1.2",
+    "expo-updates": "~0.5.4",
     "firebase": "^8.7.0",
     "jwt-decode": "2.2.0",
     "modal-react-native-web": "^0.2.0",

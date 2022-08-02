@@ -41,7 +41,7 @@ export function passwordVerifier(value){
 
   export function nameVerifier(value) {
 
-    if (value.match(lowerCaseLetters) || value.match(upperCaseLetters) && value.length >= 1) {
+    if (!value.includes(" ") && value.length >= 1 && value.match(lowerCaseLetters) || value.match(upperCaseLetters) ) {
       return true
     } else {
       return false

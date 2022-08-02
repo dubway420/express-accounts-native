@@ -74,16 +74,16 @@ export async function saveReceipt (currency, amount, date, category, images) {
 
         receiptDetails.push(receiptCurrentDetails)
 
-        var firstReceiptDate = data.firstReceiptDate
-        var latestReceiptDate = data.latestReceiptDate
+        // var firstReceiptDate = data.firstReceiptDate
+        // var latestReceiptDate = data.latestReceiptDate
 
-        if (firebase.firestore.Timestamp.fromDate(date).seconds < firstReceiptDate.seconds) {
-            firstReceiptDate = date
-        }
+        // if (firebase.firestore.Timestamp.fromDate(date).seconds < firstReceiptDate.seconds) {
+        //     firstReceiptDate = date
+        // }
 
-        if (firebase.firestore.Timestamp.fromDate(date).seconds > latestReceiptDate.seconds) {
-            latestReceiptDate = date
-        }
+        // if (firebase.firestore.Timestamp.fromDate(date).seconds > latestReceiptDate.seconds) {
+        //     latestReceiptDate = date
+        // }
 
         firestoreRefs(UserID).userLogReceipts.update({
             receipts,
@@ -92,10 +92,10 @@ export async function saveReceipt (currency, amount, date, category, images) {
             currencyCount,
             currencyTotals,
 
-            firstReceiptDate,
-            latestReceiptDate,
+            // firstReceiptDate,
+            // latestReceiptDate,
 
-            latestReceiptSubmitDate: new Date,
+            // latestReceiptSubmitDate: new Date,
 
             receiptDetails
     
@@ -144,10 +144,10 @@ export async function saveReceipt (currency, amount, date, category, images) {
         categoryTotals,
         currencyCount,
         currencyTotals,
-        firstReceiptDate: date,
-        latestReceiptDate: date,
-        firstReceiptSubmitDate: new Date,
-        latestReceiptSubmitDate: new Date,
+        // firstReceiptDate: date,
+        // latestReceiptDate: date,
+        // firstReceiptSubmitDate: new Date,
+        // latestReceiptSubmitDate: new Date,
         receiptDetails,
         // images: uploadedImages
 
@@ -167,7 +167,7 @@ export async function saveReceipt (currency, amount, date, category, images) {
 
 }
 
-export async function updateReceipts (categoryCount, categoryTotals, currencyCount, currencyTotals, firstReceiptDate, latestReceiptDate, receiptDetails) {
+export async function updateReceipts (categoryCount, categoryTotals, currencyCount, currencyTotals, receiptDetails) {
     
     var UserID = fire.auth().currentUser.uid
 
@@ -179,8 +179,8 @@ export async function updateReceipts (categoryCount, categoryTotals, currencyCou
         currencyCount,
         currencyTotals,
 
-        firstReceiptDate,
-        latestReceiptDate,
+        // firstReceiptDate,
+        // latestReceiptDate,
 
         receiptDetails
 
@@ -198,7 +198,7 @@ export async function updateReceipts (categoryCount, categoryTotals, currencyCou
     
 }
 
-export async function deleteReceipts (receipts, categoryCount, categoryTotals, currencyCount, currencyTotals, firstReceiptDate, latestReceiptDate, firstReceiptSubmitDate, latestReceiptSubmitDate, receiptDetails) {
+export async function deleteReceipts (receipts, categoryCount, categoryTotals, currencyCount, currencyTotals, receiptDetails) {
 
     var UserID = fire.auth().currentUser.uid
 
@@ -210,11 +210,11 @@ export async function deleteReceipts (receipts, categoryCount, categoryTotals, c
         currencyCount,
         currencyTotals,
 
-        firstReceiptDate,
-        latestReceiptDate,
+        // firstReceiptDate,
+        // latestReceiptDate,
 
-        firstReceiptSubmitDate, 
-        latestReceiptSubmitDate,
+        // firstReceiptSubmitDate, 
+        // latestReceiptSubmitDate,
 
         receiptDetails
 
