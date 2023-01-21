@@ -1,7 +1,7 @@
 import React from "react"
 import { Text, View } from 'react-native';
 import {styles} from './styles'
-
+import SplashScreen from './splashScreen'
 
 
 class App extends React.Component {
@@ -15,10 +15,7 @@ class App extends React.Component {
 
     return (
 
-    <View style={styles.temp}>
-      <Text>Open up App.js to start working on your app!</Text>
-
-    </View>
+      <SplashScreen/>
 
     )
 
