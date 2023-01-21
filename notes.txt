@@ -1,0 +1,17 @@
+
+---------------21/01/2023--------------
+
+* TODO
+
+----- Create testing program?
+----- Break project down into branches for each feature, develop and test each
+----- Merge all features into a new branch
+
+* Features
+
+----- Splash screen
+----- Signup page
+----- Log in Page
+----- Home page
+----- List view
+----- Navigation
