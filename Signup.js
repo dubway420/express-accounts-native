@@ -1,8 +1,9 @@
 import React , {Component} from "react"
 import { SafeAreaView, ScrollView, Image, TextInput, Text, View, TouchableOpacity, Alert } from "react-native";
 // import fire from './fire'
-import {emailVerifier, nameVerifier} from './utils/validators'
+import {emailVerifier, nameVerifier, passwordVerifier} from './utils/validators'
 import { passwordHandler } from './utils/handlers.js'
+import { getRandomInt, checkIfAllTrue } from './utils/tools'
 import {styles} from './styles'
 import background from './assets/background.jpg'
 import logo from './assets/logo.png'
@@ -64,14 +65,157 @@ export class Signup extends Component{
     this.signup = this.signup.bind(this);
     this.emailHandler = this.emailHandler.bind(this);   
     this.registrationVerification = this.registrationVerification.bind(this);
-
+    this.testing = this.testing.bind(this)
     this.state=baseState
+    this.testing()
+
+  }
+
+  testing() { 
+
+    
+    
+    // this.emailHandler("name.surname@domain.co.uk")
+    // console.log(emailVerifier(email))
+
+    let emails = {
+                  "name.surname@domain.co.uk": true, 
+                  "name.surnamedomain.co.uk": false, 
+                  "name.surname@domainuk": false,
+
+                  "example1@gmail.com": true,
+                  "example2@yahoo.com": true,
+                  "example3@hotmail.com": true,
+                  "example4@outlook.com": true,
+                  "example5@aol.com": true,
+                  "example6@gmail.co.uk": true,
+                  "example7@yahoo.co.uk": true,
+                  "example8@hotmail.co.uk": true,
+                  "example9@outlook.co.uk": true,
+                  "example10@aol.co.uk": true,
+
+                  "example.com": false,
+                  "example@": false,
+                  "@example.com": false,
+                  "example@.com": false, 
+                  "example@@example.com": false,
+                  "example@com ": false,
+                  "example@-.com ": false,
+                  "example@com.": false, 
+                  "example@!#$%^&*.com": false, 
+                  "example@.com.": false 
+
+                }
+
+    console.log("\n ---- Email Addresses ----\n")
+    for (let email in emails) {
+
+      if (emailVerifier(email) == emails[email]){
+        console.log("Passed")
+      }  
+      else {
+        console.log("Failed. Email: " + email)  
+
+
+      } 
+  
+    }
+
+    // ===================================================
+
+    let passwords = {
+      
+                    // Invalid passwords - Words Only
+                     "apple": false, 
+                     "banana": false, 
+                     "cherry": false, 
+                     "date": false, 
+                     "elderberry": false, 
+                     "fig": false, 
+                     "grape": false, 
+                     "huckleberry": false, 
+                     "kiwi": false, 
+                     "lemon": false, 
+                     "mango": false, 
+                     "nectarine": false, 
+                     "orange": false, 
+                     "peach": false, 
+                     "quince": false, 
+                     "raspberry": false, 
+                     "strawberry": false, 
+                     "tangerine": false, 
+                     "ugli": false, 
+                     "violet": false,
+
+                    // Invalid passwords - no capital letter
+                    "beguiling9":false, 
+                    "celestial82":false, 
+                    "ebullience10":false, 
+                    "effervesce30":false, 
+                    "effervescent88":false, 
+                    "efflorescence87":false, 
+                    "effulgent17":false, 
+                    "emanate11":false, 
+                    "enigmatic13":false, 
+                    "ethereal16":false, 
+                    "gargantuan4":false, 
+                    "inimitable8":false, 
+                    "inscrutable46":false, 
+                    "laudable43":false, 
+                    "loquacious53":false, 
+                    "mellifluous62":false, 
+                    "nihilistic13":false, 
+                    "quintessential3":false, 
+                    "ubiquitous79":false, 
+                    "zenith40":false,
+                     
+                    //  Valid passwords - Capital letter, lowercase letters and a number
+                     "Celestial93": true,
+                     "Conundrum58": true, 
+                     "Ebullience83": true, 
+                     "Effervesce76": true, 
+                     "Effervescence78": true, 
+                     "Efflorescence74": true, 
+                     "Effulgent33": true, 
+                     "Emanate73": true, 
+                     "Enigmatic85": true, 
+                     "Ethereal70": true, 
+                     "Gossamer75": true, 
+                     "Inimitable57": true, 
+                     "Inscrutable40": true, 
+                     "Laudable88": true, 
+                     "Loquacious66": true, 
+                     "Luminous37": true, 
+                     "Nihilistic3": true, 
+                     "Quintessential38": true, 
+                     "Ubiquitous80": true, 
+                     "Zenith46": true,
+
+
+                    }
+
+                    console.log("\n ---- Passwords ---- \n")
+                    for (let password in passwords) {
+                
+
+                      if (checkIfAllTrue(passwordVerifier(password)) == passwords[password]){
+                        console.log("Passed")
+                      }  
+                      else {
+                        console.log("Failed. Email: " + password)  
+                
+                
+                      } 
+                  
+                    }
+
+                    console.log("test")
 
   }
 
   emailHandler(email) {
 
-
+    
     // if the last character of email is a space, remove it
     if (email[email.length - 1] === ' ') {
       email = email.substring(0, email.length - 1);
@@ -81,7 +225,8 @@ export class Signup extends Component{
       email: email.toLowerCase(),
                     email_valid: emailVerifier(email),
                     email_warn: false})
-                
+    
+    
 
   }
 
@@ -148,7 +293,7 @@ export class Signup extends Component{
 
     if (verified) {
 
-      console.log("Verification successful")
+      return ("Verification successful")
 
       // fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
         
@@ -174,7 +319,7 @@ export class Signup extends Component{
     }
     else {
 
-      console.log("Verification failed")
+      return("Verification failed")
 
     }
   }
