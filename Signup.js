@@ -1,6 +1,6 @@
 import React , {Component} from "react"
 import { SafeAreaView, ScrollView, Image, TextInput, Text, View, TouchableOpacity, Alert } from "react-native";
-// import fire from './fire'
+import fire from './firebase/fire'
 import {emailVerifier, nameVerifier, passwordVerifier} from './utils/validators'
 import { passwordHandler } from './utils/handlers.js'
 import { getRandomInt, checkIfAllTrue } from './utils/tools'
@@ -287,7 +287,7 @@ export class Signup extends Component{
 
   signup() {
 
-    
+    // Makes a local check to determine if all fields contain valid data
     var verified = this.registrationVerification()
     
 
@@ -295,33 +295,30 @@ export class Signup extends Component{
 
       return ("Verification successful")
 
-      // fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
+      fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
         
-      //   console.log(this.state.fnumber)
+        console.log(this.state.fnumber)
 
-      //   u.user.updateProfile({
-      //     displayName: this.state.fname + " " + this.state.sname,
-      //   })
+        u.user.updateProfile({
+          displayName: this.state.fname + " " + this.state.sname,
+        })
 
-      //   u.user.sendEmailVerification().then(function() {
+        u.user.sendEmailVerification().then(function() {
 
-      //   })
+        })
 
-      //   this.props.navigation.navigate('receiptsView')
+        this.props.navigation.navigate('receiptsView')
 
 
-      // }).catch((err)=>{
+      }).catch((err)=>{
 
-      //   console.log(err)
+        console.log(err)
 
-      // })
+      })
 
+    
     }
-    else {
 
-      return("Verification failed")
-
-    }
   }
 
 
