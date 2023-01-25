@@ -3,7 +3,7 @@ import { SafeAreaView, ScrollView, Image, TextInput, Text, View, TouchableOpacit
 import fire from './firebase/fire'
 import {emailVerifier, nameVerifier, passwordVerifier} from './utils/validators'
 import { passwordHandler } from './utils/handlers.js'
-import { getRandomInt, checkIfAllTrue } from './utils/tools'
+import { checkIfAllTrue } from './utils/tools'
 import {styles} from './styles'
 import background from './assets/background.jpg'
 import logo from './assets/logo.png'
@@ -67,7 +67,7 @@ export class Signup extends Component{
     this.registrationVerification = this.registrationVerification.bind(this);
     this.testing = this.testing.bind(this)
     this.state=baseState
-    this.testing()
+    // this.testing()
 
   }
 
@@ -293,28 +293,31 @@ export class Signup extends Component{
 
     if (verified) {
 
-      return ("Verification successful")
 
-      fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
+      // fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
         
-        console.log(this.state.fnumber)
+      //   console.log(this.state.fnumber)
 
-        u.user.updateProfile({
-          displayName: this.state.fname + " " + this.state.sname,
-        })
+      //   u.user.updateProfile({
+      //     displayName: this.state.fname + " " + this.state.sname,
+      //   })
 
-        u.user.sendEmailVerification().then(function() {
+      //   u.user.sendEmailVerification().then(function() {
 
-        })
+      //   })
 
-        this.props.navigation.navigate('receiptsView')
+      //   Alert.alert("Success", "Successfully signed up")
+
+      //   // this.props.navigation.navigate('receiptsView')
 
 
-      }).catch((err)=>{
+      // }).catch((err)=>{
 
-        console.log(err)
+      //   Alert.alert("Failed", "Something went wrong")
 
-      })
+      //   console.log(err)
+
+      // })
 
     
     }
