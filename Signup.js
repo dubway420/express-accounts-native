@@ -1,6 +1,6 @@
 import React , {Component} from "react"
 import { SafeAreaView, ScrollView, Image, TextInput, Text, View, TouchableOpacity, Alert } from "react-native";
-import fire from './firebase/fire'
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import {emailVerifier, nameVerifier, passwordVerifier} from './utils/validators'
 import { passwordHandler } from './utils/handlers.js'
 import { checkIfAllTrue } from './utils/tools'
@@ -68,6 +68,7 @@ export class Signup extends Component{
     this.testing = this.testing.bind(this)
     this.state=baseState
     // this.testing()
+
 
   }
 
@@ -287,42 +288,47 @@ export class Signup extends Component{
 
   signup() {
 
+    
+
     // Makes a local check to determine if all fields contain valid data
     var verified = this.registrationVerification()
     
 
     if (verified) {
+      
+      const auth = getAuth();
 
-
-      // fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
+      createUserWithEmailAndPassword(auth, this.state.email, this.state.password).then((u)=>{
         
-      //   console.log(this.state.fnumber)
+        console.log(this.state.fnumber)
 
-      //   u.user.updateProfile({
-      //     displayName: this.state.fname + " " + this.state.sname,
-      //   })
+        // u.user.updateProfile({
+        //   displayName: this.state.fname + " " + this.state.sname,
+        // })
 
-      //   u.user.sendEmailVerification().then(function() {
+        u.user.sendEmailVerification().then(function() {
 
-      //   })
+        })
 
-      //   Alert.alert("Success", "Successfully signed up")
+        Alert.alert("Success", "Successfully signed up")
 
-      //   // this.props.navigation.navigate('receiptsView')
+        // this.props.navigation.navigate('receiptsView')
 
 
-      // }).catch((err)=>{
+      }).catch((err)=>{
 
-      //   Alert.alert("Failed", "Something went wrong")
+        Alert.alert("Failed", "Something went wrong")
 
-      //   console.log(err)
+        console.log(err)
 
-      // })
+      })
 
     
+    } 
+
     }
 
-  }
+  
 
 
 
