@@ -1,6 +1,6 @@
 import React , {Component} from "react"
 import { SafeAreaView, ScrollView, Image, TextInput, Text, View, TouchableOpacity, Alert } from "react-native";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import {emailVerifier, nameVerifier, passwordVerifier} from './utils/validators'
 import { passwordHandler } from './utils/handlers.js'
 import { checkIfAllTrue } from './utils/tools'
@@ -66,8 +66,10 @@ export class Signup extends Component{
     this.emailHandler = this.emailHandler.bind(this);   
     this.registrationVerification = this.registrationVerification.bind(this);
     this.testing = this.testing.bind(this)
+    this.testing_signup_firebase = this.testing_signup_firebase(this)
+
     this.state=baseState
-    // this.testing()
+    
 
 
   }
@@ -214,6 +216,29 @@ export class Signup extends Component{
 
   }
 
+  testing_signup_firebase() {
+
+    const auth = getAuth();
+
+    console.log(auth.currentUser)
+
+    // createUserWithEmailAndPassword(auth, "huwjones37@gmail.com", "Example1").then((u)=>{
+      
+    //   updateProfile(u.user, {
+    //     displayName: "Huw Jones"
+    //   })
+  
+    // })
+
+    // const auth = getAuth();
+
+    // updateProfile(auth.currentUser, {
+    //   displayName: "Huw Jones"
+    // })
+
+
+  }
+
   emailHandler(email) {
 
     
@@ -300,15 +325,15 @@ export class Signup extends Component{
 
       createUserWithEmailAndPassword(auth, this.state.email, this.state.password).then((u)=>{
         
-        console.log(this.state.fnumber)
+        console.log(u.user)
 
         // u.user.updateProfile({
         //   displayName: this.state.fname + " " + this.state.sname,
         // })
 
-        u.user.sendEmailVerification().then(function() {
+        // u.user.sendEmailVerification().then(function() {
 
-        })
+        // })
 
         Alert.alert("Success", "Successfully signed up")
 
