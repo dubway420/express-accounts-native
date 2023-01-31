@@ -1,7 +1,7 @@
 import React from "react"
 import { Text, View } from 'react-native';
 import {styles} from './styles'
-import { Signup } from './Signup'
+import { Login } from './Login'
 import initializeFirebase from './firebase/fire'
 
 
@@ -21,7 +21,7 @@ class App extends React.Component {
 
     return (
 
-    <Signup/>
+    <Login/>
 
     )
 
