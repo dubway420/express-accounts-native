@@ -36,8 +36,8 @@ export class Login extends Component{
   constructor(props){
     super(props)
 
-    this.cancel = this.cancel.bind(this);
-    this.signup = this.signup.bind(this);
+    this.login = this.login.bind(this);
+    this.register = this.register.bind(this);
   
 
 
@@ -48,104 +48,60 @@ export class Login extends Component{
 
   }
 
-  
+  login(e){
 
-  cancel(e){
 
-    this.props.navigation.navigate('Login')
+    // e.preventDefault();
+    fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
+
+      this.props.navigation.navigate("receiptsView")
+      
+
+    }).catch((err)=>{
+
+      console.log(err)
+      
+      this.setState({error: true})
+    })
 
   }
 
-  registrationVerification() {
+  register(e){
 
-    var lastChar = this.state.email.substring(this.state.email.length-1)
-    
-    if (lastChar === " ") {
-      
-	
-      this.setState({email: this.state.email.slice(0, -1)})
+    // this.setState({signup: true})
+    this.props.navigation.navigate('Sign up')
+ 
+  }
 
+  sendResetEmail = async () => {
 
-    } 
+    await fire.auth().sendPasswordResetEmail(this.state.emailReset).then(() => {
 
-    var valid = 1
+      Alert.alert(
+        "Reset Password",
+        "A password reset email has been sent to your email address",
+        [
+          { text: "OK", onPress: () => console.log("OK Pressed") }
+        ]
+      );
 
-    if (!this.state.email_valid){
-      this.setState({email_warn: true})
-      valid -= 1 
-    }
-    if (!this.state.pvalid8 || !this.state.pvalidNumbers || !this.state.pvalidUpperLower) {
-      this.setState({password_warn: true})
-      valid -= 1
-    }
-    if (!this.state.password_check_valid) {
-      this.setState({password_check_warn: true})
-      valid -= 1
-    } 
-    if (!this.state.fname_valid) {
-      this.setState({fname_warn: true})
-      valid -= 1
-    }
-    if (!this.state.sname_valid) {
-      this.setState({sname_warn: true})
-      valid -= 1
-    }
-    if (!this.state.acceptPrivacyPolicy) {
-      this.setState({acceptPrivacyPolicy_warn: true})
-      valid -= 1
-    }
+    }).catch(error => {
 
-    if (valid < 1) {
-      Alert.alert("Error", "Some of the values you entered were incorrect. Please review the highlighted fields.")
-      return false}
-    else {return true}  
+      Alert.alert(
+        "Reset Password",
+        "Something went wrong, please try again",
+        [
+          { text: "OK", onPress: () => console.log("OK Pressed") }
+        ]
+      );
+
+    })
 
   }
 
-  signup() {
-
-    
-
-    // Makes a local check to determine if all fields contain valid data
-    var verified = this.registrationVerification()
-    
-
-    if (verified) {
-      
-      const auth = getAuth();
-
-      createUserWithEmailAndPassword(auth, this.state.email, this.state.password).then((u)=>{
-        
-        console.log(u.user)
-
-        // u.user.updateProfile({
-        //   displayName: this.state.fname + " " + this.state.sname,
-        // })
-
-        // u.user.sendEmailVerification().then(function() {
-
-        // })
-
-        Alert.alert("Success", "Successfully signed up")
-
-        // this.props.navigation.navigate('receiptsView')
-
-
-      }).catch((err)=>{
-
-        Alert.alert("Failed", "Something went wrong")
-
-        console.log(err)
-
-      })
-
-    
-    } 
-
-    }
-
-  
-
+  componentDidMount(){
+    console.log("componentDidMount: login")
+  }
 
 
 
@@ -166,28 +122,20 @@ export class Login extends Component{
             <View style={styles.box}>
 
 
-            <Image style={styles.logo} source={logo} />
-            <Text style = {styles.text && {borderBottomWidth: 1, alignSelf: 'center', marginTop: 20}} >Please fill out all of the fields below:</Text>
-
-            
-
-            {/* <View style = {styles.textContainer}> */}
-            {this.state.email_warn && <Text style={styles.error}>Error: Invalid email address.</Text>}
-                <TextInput style = {styles.input}
-                    underlineColorAndroid = "transparent"
-                    type="email"
-                    id="email"
-                    name="email"
-                    // autoComplete="email address"
-                    placeholder="Enter email address"
-                    placeholderTextColor = "black"
-                    autoCapitalize = "none"
-                    value={this.state.email}
-                    onChangeText = {(email) => emailHandler(email)}/>
+              <Image style={styles.logo} source={logo} />
+              <TextInput style = {styles.input}
+              underlineColorAndroid = "transparent"
+              type="email"
+              id="email"
+              name="email"
+              // autoComplete="email address"
+              placeholder="Enter email address"
+              placeholderTextColor = "black"
+              autoCapitalize = "none"
+              value={this.state.email}
+              onChangeText = {(email) => emailHandler(email)}/>
                 
-                
-                {this.state.password_warn && <Text style={styles.error}>Error: Invalid password.</Text>}
-                <View style = {styles.inputAlt}>
+              <View style = {styles.inputAlt}>
                   
                   <TextInput style={styles.inputAltInner}
                       underlineColorAndroid = "transparent"
@@ -204,133 +152,23 @@ export class Login extends Component{
 
                   <Icon style={styles.searchIcon} onPress={
                     () => this.setState({password_see: !this.state.password_see})} name={this.state.password_see ? "eye-slash" : "eye"} size={20} color="#000"/>
-                </View>        
+              </View>        
 
-                <Text style = {styles.passwordMessage} >Password must contain:   </Text>    
-                <Text style = {this.state.pvalid8 ?  styles.passwordCorrect : styles.passwordMessage} > {this.state.pvalid8 ? '\u2713': '\u2717'} at least 8 characters</Text>
-                <Text style = {this.state.pvalidUpperLower ?  styles.passwordCorrect : styles.passwordMessage} > {this.state.pvalidUpperLower ? '\u2713': '\u2717'} upper and lowercase letters</Text>
-                <Text style = {this.state.pvalidNumbers ?  styles.passwordCorrect : styles.passwordMessage} > {this.state.pvalidNumbers ? '\u2713': '\u2717'} at least one number</Text>
-            {/* </View>  */}
+       
             
             {this.state.password_check_warn && <Text style={styles.error}>Error: Invalid confirmation password.</Text>}
-            <View style = {styles.inputAlt}>
-
-            <TextInput style = {styles.inputAltInner}
-                    underlineColorAndroid = "transparent"
-                    type="password_check"
-                    id="password_check"
-                    name="password_check"
-                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-                    // autoComplete="none"
-                    placeholder="Confirm password"
-                    placeholderTextColor = "black"
-                    autoCapitalize = "none"
-                    secureTextEntry={!this.state.password_check_see}
-                    onChangeText = {(password_check) => { 
-                     
-                        this.setState({ 
-                            password_check: password_check});
-                            
-                            if (password_check == "" || this.state.password == "") {
-                              this.setState({
-                                password_check_valid: null,
-                                password_check_message: null
-                              })
-                            }
-                            else if (password_check == this.state.password) {
-                              this.setState({
-                                password_check_valid: true,
-                                password_check_message: " \u2713 Passwords match"
-
-                              })
-                            } else {
-                              this.setState({
-                              password_check_valid: false,
-                              password_check_message: "\u2717 Passwords do not match"
-                              })
-                            }
-
-                          }
-                        }/>
-
-                    <Icon style={styles.searchIcon} onPress={
-                    () => this.setState({password_check_see: !this.state.password_check_see, password_check_warn: false})} name={this.state.password_check_see ? "eye-slash" : "eye"} size={20} color="#000"/>
-            </View>
+            
 
             {this.state.password_check_message && <Text style={this.state.password_check_valid ? styles.passwordCorrect : styles.error}>{this.state.password_check_message}</Text>}
             
             <Text style={{ textAlign: 'center', marginTop: 10, borderBottomWidth: 1 }}> </Text>
 
-            {this.state.fname_warn && <Text style={styles.error}>Error: Please provide a valid first name.</Text>}
-            {/* <View style = {styles.textContainer}> */}
-
-                <TextInput style = {styles.input}
-                    underlineColorAndroid = "transparent"
-                    type="text"
-                    id="fname"
-                    name="fname"
-                    // autoComplete="first name"
-                    placeholder="Enter first name"
-                    placeholderTextColor = "black"
-                    autoCapitalize = "none"
-                    onChangeText = {(fname) => { this.setState({ fname: fname,
-                                                                 fname_valid: nameVerifier(fname),
-                                                                 fname_warn: false})}}/>
-
-            {this.state.sname_warn && <Text style={styles.error}>Error: Please provide a valid surname.</Text>}
-
-                <TextInput style = {styles.input}
-                    underlineColorAndroid = "transparent"
-                    type="text"
-                    id="sname"
-                    name="sname"
-                    // autoComplete="Surname"
-                    placeholder="Enter surname"
-                    placeholderTextColor = "black"
-                    autoCapitalize = "none"
-                    onChangeText = {(sname) => { this.setState({ sname: sname,
-                                                                 sname_valid: nameVerifier(sname),
-                                                                 sname_warn: false})}}/>
-
-            {/* {this.state.fnumber_warn && <Text style={styles.error}>Error: Invalid telephone number.</Text>}
-                <TextInput style = {styles.input}
-                    underlineColorAndroid = "transparent"
-                    type="tel"
-                    id="fnumber"
-                    name="fnumber"
-                    keyboardType="numeric"
-                    autoComplete="telephone number"
-                    placeholder="Enter phone number"
-                    placeholderTextColor = "black"
-                    autoCapitalize = "none"
-                    onChangeText = {(fnumber) => { this.setState({ fnumber: fnumber, 
-                                                                   fnumber_valid: phoneNumberVerifier(fnumber),
-                                                                   fnumber_warn: false})}}/>       */}
-            
-            {/* </View> */}
-
-          {this.state.acceptPrivacyPolicy_warn && <Text style={styles.error}> Please indicate that you have read the privacy policy. </Text>}
-          <View style={{flexDirection: "row", alignItems: "center", marginLeft: 10}}>
-
-            <CheckBox
-              disabled={false}
-              value={this.state.acceptPrivacyPolicy}
-              onValueChange={(newValue) => this.setState({acceptPrivacyPolicy: newValue})}
-            />
-
-          <Text id="message" style={{color: "blue", marginTop: 10,
-                      marginLeft: 20,
-                      marginBottom: 10,
-                      alignSelf: 'center'}}
-                      onPress={() => Linking.openURL('https://www.termsfeed.com/live/9a4c53e1-5df9-4ac0-9c2b-130f3df1ff23')}> I have read the privacy policy </Text>
-
-
-          </View>  
+         
 
             <TouchableOpacity
                 style = {styles.submitButton}
                 onPress = {
-                    () => this.signup()
+                    () => this.login()
                 }>
                 <Text style = {styles.submitButtonText}> Sign Up </Text>
             </TouchableOpacity>
