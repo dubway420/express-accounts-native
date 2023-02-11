@@ -304,15 +304,10 @@ export class Signup extends Component{
 
       createUserWithEmailAndPassword(auth, this.state.email, this.state.password).then((u)=>{
         
+        updateProfile(u.user, {displayName: this.state.fname + this.state.sname})
+
         console.log(u.user)
 
-        // u.user.updateProfile({
-        //   displayName: this.state.fname + " " + this.state.sname,
-        // })
-
-        // u.user.sendEmailVerification().then(function() {
-
-        // })
 
         Alert.alert("Success", "Successfully signed up")
 
@@ -339,6 +334,10 @@ export class Signup extends Component{
 
   
   render() {
+
+    const auth = getAuth();
+
+    // console.log(u.user)
     
       return(
         
@@ -371,7 +370,7 @@ export class Signup extends Component{
                     placeholderTextColor = "black"
                     autoCapitalize = "none"
                     value={this.state.email}
-                    onChangeText = {(email) => emailHandler(email)}/>
+                    onChangeText = {(email) => emailHandler(this, email)}/>
                 
                 
                 {this.state.password_warn && <Text style={styles.error}>Error: Invalid password.</Text>}

@@ -8,9 +8,22 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import { Linking } from 'react-native';
 import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
 import { emailHandler, passwordHandler } from './utils/handlers.js'
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
 
 // Provides a sign up page for new users to enter their details
 // The user can enter their name, password, email address and asks them to read and accept the privacy policy
+
+// TODO 
+// Google login 
+// Microsoft login 
+// Reset password
+
+// Testing
+// log in with username and password
+// Federated log in
+// Existing user
+// Banned user
 
 // Base settings for page state
 var baseState = {
@@ -52,9 +65,13 @@ export class Login extends Component{
 
 
     // e.preventDefault();
-    fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
+    const auth = getAuth();
 
-      this.props.navigation.navigate("receiptsView")
+    signInWithEmailAndPassword(auth, this.state.email, this.state.password).then((u)=>{
+
+      Alert.alert("Success", "Successfully signed in")
+
+      console.log(u.user)
       
 
     }).catch((err)=>{
@@ -133,7 +150,7 @@ export class Login extends Component{
               placeholderTextColor = "black"
               autoCapitalize = "none"
               value={this.state.email}
-              onChangeText = {(email) => emailHandler(email)}/>
+              onChangeText = {(email) => emailHandler(this, email)}/>
                 
               <View style = {styles.inputAlt}>
                   
@@ -170,7 +187,7 @@ export class Login extends Component{
                 onPress = {
                     () => this.login()
                 }>
-                <Text style = {styles.submitButtonText}> Sign Up </Text>
+                <Text style = {styles.submitButtonText}> Sign In </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -178,7 +195,7 @@ export class Login extends Component{
                 onPress = {
                     () => this.cancel()
                 }>
-                <Text style = {styles.submitButtonText}> Cancel </Text>
+                <Text style = {styles.submitButtonText}> Register </Text>
             </TouchableOpacity>
 
             </View> 

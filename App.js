@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import {styles} from './styles'
 import { Login } from './Login'
 import initializeFirebase from './firebase/fire'
+import { Signup } from "./Signup";
 
 
 

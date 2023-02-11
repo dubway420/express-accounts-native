@@ -1,6 +1,6 @@
-import {passwordVerifier} from './validators'
+import {passwordVerifier, emailVerifier} from './validators'
 
-export function emailHandler(email) {
+export function emailHandler(obj, email) {
 
     
   // if the last character of email is a space, remove it
@@ -8,7 +8,7 @@ export function emailHandler(email) {
     email = email.substring(0, email.length - 1);
   }
 
-  this.setState({
+  obj.setState({
     email: email.toLowerCase(),
                   email_valid: emailVerifier(email),
                   email_warn: false})
