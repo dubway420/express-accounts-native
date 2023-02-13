@@ -219,21 +219,18 @@ export class Signup extends Component{
 
     const auth = getAuth();
 
-    console.log(auth.currentUser)
-
-    // createUserWithEmailAndPassword(auth, "huwjones37@gmail.com", "Example1").then((u)=>{
+    createUserWithEmailAndPassword(auth, "huwjones37@gmail.com", "Example1").then((u)=>{
       
-    //   updateProfile(u.user, {
-    //     displayName: "Huw Jones"
-    //   })
-  
-    // })
 
-    // const auth = getAuth();
+    }).catch((err)=>{
 
-    // updateProfile(auth.currentUser, {
-    //   displayName: "Huw Jones"
-    // })
+
+
+      if (err.message == "Firebase: Error (auth/email-already-in-use).") {
+        Alert.alert("Signup Failed", "The email address you entered is already in use.")
+      }
+
+    })
 
 
   }
@@ -316,10 +313,17 @@ export class Signup extends Component{
 
       }).catch((err)=>{
 
-        Alert.alert("Failed", "Something went wrong")
 
-        console.log(err)
 
+        if (err.message == "Firebase: Error (auth/email-already-in-use).") {
+          Alert.alert("Signup Failed", "The email address you entered is already in use.")
+        } else {
+
+          Alert.alert("Signup Failed", "Something went wrong. Please try again.")
+
+
+        }
+  
       })
 
     
@@ -335,9 +339,7 @@ export class Signup extends Component{
   
   render() {
 
-    const auth = getAuth();
-
-    // console.log(u.user)
+    // this.testing_signup_firebase()
     
       return(
         

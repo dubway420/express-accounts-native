@@ -140,6 +140,12 @@ export class Login extends Component{
 
 
               <Image style={styles.logo} source={logo} />
+
+              <View style = {styles.textContainer}>
+                <Text style = {styles.text && {borderBottomWidth: 1, alignSelf: 'center', marginTop: 20}} >Welcome to Express Accounts</Text>
+                <Text id="message" style={styles.text }>Please log in or sign up</Text>
+              </View>
+
               <TextInput style = {styles.input}
               underlineColorAndroid = "transparent"
               type="email"
