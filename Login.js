@@ -5,10 +5,11 @@ import {styles} from './styles'
 import background from './assets/background.jpg'
 import logo from './assets/logo.png'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon2 from 'react-native-vector-icons/Fontisto'
 import { Linking } from 'react-native';
 import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
 import { emailHandler, passwordHandler } from './utils/handlers.js'
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 
 // Provides a sign up page for new users to enter their details
@@ -79,6 +80,20 @@ export class Login extends Component{
       console.log(err)
       
       this.setState({error: true})
+
+      if (err.message == "Firebase: Error (auth/invalid-email).") {
+        Alert.alert("Sign In Failed", "The email address you specified is invalid. Please try again or register. ")
+      }
+      else if (err.message == "Firebase: Error (auth/user-not-found).") {
+        Alert.alert("Sign In Failed", "We couldn't find a registered user with the details you provided. Have you registered?")
+      }
+      else if (err.message == "Firebase: Error (auth/wrong-password).") {
+        Alert.alert("Sign In Failed", "The password you specified is incorrect. Please try again or request a password reset.")
+      }
+      else {
+        Alert.alert("Sign In Failed", "We're sorry but we couldn't log you in with the details you provided. Please try again, request a password reset or register.")
+      }
+
     })
 
   }
@@ -177,32 +192,60 @@ export class Login extends Component{
                     () => this.setState({password_see: !this.state.password_see})} name={this.state.password_see ? "eye-slash" : "eye"} size={20} color="#000"/>
               </View>        
 
-       
-            
-            {this.state.password_check_warn && <Text style={styles.error}>Error: Invalid confirmation password.</Text>}
-            
+              <Text id="message" style={{color: "blue", 
+                      // marginTop: 5,
+                      borderBottomWidth: 1,
+                      borderBottomColor: "blue",
+                      marginLeft: 20,
+                      marginBottom: 10,
+                      alignSelf: 'flex-start'
+                    }}
+                      // onPress={() => Linking.openURL('https://www.termsfeed.com/live/9a4c53e1-5df9-4ac0-9c2b-130f3df1ff23')}
+                      > 
+                      Forgotten password? </Text>
 
-            {this.state.password_check_message && <Text style={this.state.password_check_valid ? styles.passwordCorrect : styles.error}>{this.state.password_check_message}</Text>}
-            
-            <Text style={{ textAlign: 'center', marginTop: 10, borderBottomWidth: 1 }}> </Text>
 
+            
+          
          
 
-            <TouchableOpacity
-                style = {styles.submitButton}
-                onPress = {
-                    () => this.login()
-                }>
-                <Text style = {styles.submitButtonText}> Sign In </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                  style = {styles.submitButton}
+                  onPress = {
+                      () => this.login()
+                  }>
+                  <Text style = {styles.submitButtonText}> Sign In </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-                style = {styles.submitButton}
-                onPress = {
-                    () => this.cancel()
-                }>
-                <Text style = {styles.submitButtonText}> Register </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                  style = {styles.submitButton}
+                  onPress = {
+                      () => this.cancel()
+                  }>
+                  <Text style = {styles.submitButtonText}> Register </Text>
+              </TouchableOpacity>
+
+            </View>
+
+            <View style={styles.fedBox}>
+
+              <TouchableOpacity
+                  style = {styles.federatedButton}
+                  onPress = {
+                      () => this.login()
+                  }>
+                    <Icon style={styles.searchIcon} name={"google"} size={20} color="#000"/>
+                  <Text style = {styles.federatedButtonText}> Google </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                  style = {styles.federatedButton}
+                  onPress = {
+                      () => this.login()
+                  }>
+                    <Icon2 style={styles.searchIcon} name={"microsoft"} size={20} color="#000"/>
+                  <Text style = {styles.federatedButtonText}> Microsoft </Text>
+              </TouchableOpacity>
 
             </View> 
             

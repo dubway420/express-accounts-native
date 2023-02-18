@@ -52,6 +52,15 @@ export const styles = StyleSheet.create({
       height: '90%',
       justifyContent: "center",
       },
+      fedBox: {
+        marginTop:15,
+        flex: 1,
+        flexDirection: "row",
+        flexWrap: 'wrap',
+        backgroundColor: "white",
+        height: '90%',
+        justifyContent: "center",
+        },
     large: {
       position:'absolute',
       left:0, 
@@ -331,6 +340,19 @@ export const styles = StyleSheet.create({
       height: 40,
       width: '90%'
    },
+   federatedButton: {
+    flex:1,
+    flexDirection: 'row',
+    // justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderColor: "black",
+    borderWidth: 1,
+    padding: 10,
+    margin: 15,
+    height: 45,
+    width: '45%'
+ },
    photoButton: {
     backgroundColor: 'blue',
     padding: 10,
@@ -378,8 +400,14 @@ utilityButton2: {
 },
    submitButtonText:{
       color: 'white',
-      textAlign: 'center'
+      textAlign: 'center',
+      
    },
+   federatedButtonText:{
+    color: 'black',
+    textAlign: 'center',
+    
+ },
    error: {
      color: 'red',
      marginLeft: 30,
