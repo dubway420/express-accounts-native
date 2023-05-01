@@ -1,15 +1,15 @@
 
-## 🚀 Homework Assignment 1
+# 🚀 Homework Assignment 1
 
-# Install Docker
+## Install Docker
 
 Go to the [Docker website](https://www.docker.com/), install and run it. When it is running, you should  see a yellow bar in the bottom left corner with the Docker symbol on it - this means Docker is running.
 
-# Make a Docker Hub account and log in via the application
+## Make a Docker Hub account and log in via the application
 
 Go to the [Docker Hub Website](https://hub.docker.com/) and create an account. Once your account is created, you should be able to now log in via the Docker application.
 
-# Pull a Docker Image to your computer
+## Pull a Docker Image to your computer
 
 The next thing you are going to do is download a Docker image to your computer. Think of a Docker image as like a copy of an entire computer - all the same files and programmes will be on this image. It will allow us to produce our application in the exact same computer environment. 
 
