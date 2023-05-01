@@ -1,37 +1,22 @@
-# Auth0 Example
 
-<p>
-  <!-- iOS -->
-  <img alt="Supports Expo iOS" longdesc="Supports Expo iOS" src="https://img.shields.io/badge/iOS-4630EB.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff" />
-  <!-- Android -->
-  <img alt="Supports Expo Android" longdesc="Supports Expo Android" src="https://img.shields.io/badge/Android-4630EB.svg?style=flat-square&logo=ANDROID&labelColor=A4C639&logoColor=fff" />
-  <!-- Web -->
-  <img alt="Supports Expo Web" longdesc="Supports Expo Web" src="https://img.shields.io/badge/web-4630EB.svg?style=flat-square&logo=GOOGLE-CHROME&labelColor=4285F4&logoColor=fff" />
-</p>
+## 🚀 Homework Assignment 1
 
-## 🚀 How to use
+# Install Docker
 
-- Install with `yarn` or `npm install`.
-- Create your own app on [Auth0](https://auth0.com).
-- Add the `AuthSession` auth URL to `Allowed Callback URLs` on Auth0.
-- Open `App.js` and replace `auth0ClientId` and `auth0Domain` with your app settings.
-- Run [`expo start`](https://docs.expo.io/versions/latest/workflow/expo-cli/), try it out.
+Go to the [Docker website](https://www.docker.com/), install and run it. When it is running, you should  see a yellow bar in the bottom left corner with the Docker symbol on it - this means Docker is running.
 
-#### AuthSession callback URL
+# Make a Docker Hub account and log in via the application
 
-The AuthSession helps you with browser authentication, without the need of an additional server or website. To use this with Auth0 authentication flows, we need to tell Auth0 that the callback URLs are allowed.
+Go to the [Docker Hub Website](https://hub.docker.com/) and create an account. Once your account is created, you should be able to now log in via the Docker application.
 
-Each Expo user has it's own URL for different projects, the basic structure of this URL is `https://auth.expo.io/@your-username/your-expo-app-slug`. If you are signed in as `awesome-ppl`, and your app is called `meme-explorer`, your URL looks like `https://auth.expo.io/@awesome-ppl/meme-explorer`.
+# Pull a Docker Image to your computer
 
-> [Read more about AuthSession here](https://docs.expo.io/versions/latest/sdk/auth-session/)
+The next thing you are going to do is download a Docker image to your computer. Think of a Docker image as like a copy of an entire computer - all the same files and programmes will be on this image. It will allow us to produce our application in the exact same computer environment. 
 
-#### Auth0 app settings
+On Docker Hub, there are thousands of images which are used for all sorts of things. Take a browse through the images on Docker Hub - you can do this via the webiste or the Docker application. Pick an image you like the look of, maybe one with something to do with JavaScript. 
 
-Both the `auth0ClientId` and `auth0Domain` needs to match your Auth0 app settings.
+One you've picked a Docker image, your task is to pull this image to your computer. This is quite a simple thing to do, but might be a bit of a challenge if you've never done anything like this before. 
 
-![Application Settings](https://i.imgur.com/Io9I4qg.jpg)
+You might be able to figure out how to do it by messing around in the Docker application, or you can look it up on a website.
 
-## 📝 Notes
-
-- [Expo AuthSession docs](https://docs.expo.io/versions/latest/sdk/auth-session/)
-- [Auth0 React/SPA quickstart guide](https://auth0.com/docs/quickstart/spa/react)
+Hint: there's more than one way to do it. You can do it via the Docker application or via a command line interface such as Windows Powershell. 
