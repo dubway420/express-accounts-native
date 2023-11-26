@@ -1,0 +1,41 @@
+import React from 'react';
+import { View, Image, StyleSheet } from 'react-native';
+
+const FrontPage = () => {
+  return (
+    <View style={styles.container}>
+      {/* Background Image */}
+      <Image
+        source={require('./path/to/backgroundImage.jpg')}
+        style={styles.backgroundImage}
+      />
+      {/* Foreground Logo */}
+      <Image
+        source={require('./path/to/logoImage.png')}
+        style={styles.logoImage}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover', // or 'contain' based on your preference
+  },
+  logoImage: {
+    width: 200, // Adjust the width and height as needed
+    height: 200,
+    resizeMode: 'contain', // or 'cover' based on your preference
+    // You can also add margin, padding, etc. to position the logo as desired
+  },
+});
+
+export default FrontPage;
