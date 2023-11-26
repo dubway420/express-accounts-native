@@ -6,12 +6,12 @@ const FrontPage = () => {
     <View style={styles.container}>
       {/* Background Image */}
       <Image
-        source={require('./background.jpg')}
+        source={require('background.jpg')}
         style={styles.background}
       />
       {/* Foreground Logo */}
       <Image
-        source={require('./logo.png')}
+        source={require('logo.png')}
         style={styles.logo/png}
       />
     </View>
