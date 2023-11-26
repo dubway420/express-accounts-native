@@ -6,13 +6,13 @@ const FrontPage = () => {
     <View style={styles.container}>
       {/* Background Image */}
       <Image
-        source={require('./path/to/backgroundImage.jpg')}
-        style={styles.backgroundImage}
+        source={require('./background.jpg')}
+        style={styles.background}
       />
       {/* Foreground Logo */}
       <Image
-        source={require('./path/to/logoImage.png')}
-        style={styles.logoImage}
+        source={require('./logo.png')}
+        style={styles.logo/png}
       />
     </View>
   );
@@ -24,13 +24,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backgroundImage: {
+  background: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     resizeMode: 'cover', // or 'contain' based on your preference
   },
-  logoImage: {
+  logo: {
     width: 200, // Adjust the width and height as needed
     height: 200,
     resizeMode: 'contain', // or 'cover' based on your preference
