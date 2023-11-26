@@ -12,7 +12,7 @@ const FrontPage = () => {
       {/* Foreground Logo */}
       <Image
         source={require('logo.png')}
-        style={styles.logo/png}
+        style={styles.logo.png}
       />
     </View>
   );
